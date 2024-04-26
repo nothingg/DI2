@@ -13,7 +13,7 @@ logging.basicConfig(filename='error.log', level=logging.ERROR, format='%(asctime
 
 def login(driver, username, password):
     # Perform login with provided credentials
-    driver.get("https://mpaystation.ais.co.th/AISPayStationGenWeb/authenUser")
+    driver.get("https://mpaystation.ais.co.th/AISPayStationGenWeb/authenUser?command=start")
 
     input_username = driver.find_element(By.NAME, "username")
     input_password = driver.find_element(By.NAME, "password")
@@ -54,8 +54,12 @@ def download_xmlfile(driver):
     xml_link.click()
     time.sleep(10)
 
-#TODO : find element PDF
+#TODO : if PDF file can't donwload , it's download manual
+    # Switch to the new tab
+    driver.switch_to.window(driver.window_handles[1])
+
     pdf_link = driver.find_element(By.XPATH, f"//a[contains(@onclick, 'AIS{txt_dated_yesterday}.xml')]")
+
     pdf_link.click()
     time.sleep(3)
 
@@ -96,8 +100,8 @@ def main():
         login(driver, username, password)
         time.sleep(3)
 
-        download_txtfile(driver)
-        time.sleep(3)
+        # download_txtfile(driver)
+        # time.sleep(3)
 
         download_xmlfile(driver)
         time.sleep(3)
