@@ -22,6 +22,9 @@ ahref = driver.find_element(By.CSS_SELECTOR,"a[href='file_1.txt']")
 # Click the link (optional)
 ahref.click()
 
+
+driver.get("https://www.selenium.dev/selenium/web/clicks.html")
+
 # Configure logging
 # logging.basicConfig(filename='error.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
 logging.basicConfig(filename='error.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s')
@@ -56,11 +59,11 @@ def move_files(source_dir, destination_dir):
 # source_dir = "C:/Downloads"
 # destination_dir = "D:/_GHB/Python/DI2/download"
 
-source_dir = "C:/Users/GHBservice/Downloads"
-destination_dir = "E:/my_work_OLD/_Git/Python/DI2/download"
-
-# Move files
-move_files(source_dir, destination_dir)
+# source_dir = "C:/Users/GHBservice/Downloads"
+# destination_dir = "E:/my_work_OLD/_Git/Python/DI2/download"
+#
+# # Move files
+# move_files(source_dir, destination_dir)
 
 #Login
 #Open Website

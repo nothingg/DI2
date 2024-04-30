@@ -40,6 +40,75 @@ def logout(driver):
     logout_link.click()
     time.sleep(3)
 
+def payment_l001_new(driver):
+    # https://unicorn.baac.or.th/ws-payment-l001/2024/04/29
+    today = datetime.now()
+    yesterday = today - timedelta(days=1)
+    today_ymd = today.strftime("%Y/%m/%d")
+
+# Page Zip
+    url_date_ym = "https://unicorn.baac.or.th/ws-payment-l001/" + yesterday.strftime("%Y/%m")
+    driver.get(url_date_ym)
+    time.sleep(30)
+
+    # Find the element you want to click
+    span_payment = driver.find_element(By.XPATH, f"//span[@class='text_label' and contains(text(), '{today_ymd}')]")
+
+    # Scroll the webpage to bring the element into view
+    driver.execute_script("arguments[0].scrollIntoView();", span_payment)
+
+    # Click on the element using JavaScript
+    driver.execute_script("arguments[0].click();", span_payment)
+
+    css_download_zip = driver.find_element(By.ID, "download_button")
+    css_download_zip.click()
+
+# Page Detail
+
+    url_date_ymd = "https://unicorn.baac.or.th/ws-payment-l001/" + yesterday.strftime("%Y/%m/%d")
+    driver.get(url_date_ymd)
+    time.sleep(30)
+
+    file_ymd = yesterday.strftime("%Y%m%d")
+    css_download = driver.find_element(By.ID, "download_button_label")
+    css_id_row_dc106 = "item-" + file_ymd + "dc106l001" + file_ymd + "pdf"
+    css_row_dc106 = driver.find_element(By.ID, css_id_row_dc106)
+    css_row_dc106.click()
+    css_download.click()
+
+    time.sleep(5)
+
+    css_id_row_dc105 = "item-" + file_ymd + "dc105l001" + file_ymd + "pdf"
+    css_row_dc105 = driver.find_element(By.ID, css_id_row_dc105)
+    css_row_dc105.click()
+    css_download.click()
+
+    time.sleep(5)
+
+def statement_ghb(driver):
+    # https://unicorn.baac.or.th/ws-statement-GHB1/2024/04/29
+    today = datetime.now()
+    yesterday = today - timedelta(days=1)
+    today_ymd = today.strftime("%Y/%m/%d")
+
+    url_date_ym = "https://unicorn.baac.or.th/ws-statement-GHB1/" + yesterday.strftime("%Y/%m/%d")
+    driver.get(url_date_ym)
+    time.sleep(30)
+
+    css_content = driver.find_element(By.ID, "content_pane")
+    css_content.click()
+    time.sleep(3)
+
+
+    # Find the element you want to click
+    span_payment = driver.find_element(By.XPATH, f"//span[@class='text_label' and contains(text(), '{today_ymd}')]")
+    span_payment.click()
+
+    css_download = driver.find_element(By.ID, "download_button_label")
+    css_download.click()
+
+
+
 def payment_l001(driver):
 
     current_time = time.time()
@@ -50,6 +119,7 @@ def payment_l001(driver):
     yesterday = today - timedelta(days=1)
     this_ymd = yesterday.strftime("%Y%m%d")
 
+    time.sleep(5)
     menu = driver.find_element(By.ID, "repo_chooser")  # driver.find_element(By.XPATH, "//a[@href='#']")
 
     # Create an ActionChains object
@@ -59,7 +129,7 @@ def payment_l001(driver):
     actions.move_to_element(menu).perform()
     time.sleep(5)
 
-    # Find the span element containing the text "payment[GHB1]"
+    # Find the span element containing the text "payment[L001]"
     span_payment = driver.find_element(By.XPATH, "//span[text()='payment[L001]']")
     span_payment.click()
 
@@ -83,6 +153,12 @@ def payment_l001(driver):
     # Option 2: Scroll to the element before clicking
 
 #TODO : connot find id css
+    # Find the span element with class "text_label" containing the text "2024/04/02"
+    span_payment = driver.find_element(By.XPATH, "//span[@class='text_label' and contains(text(), '2024/04/02')]")
+    span_payment.click()
+    time.sleep(3)
+    actions.double_click(span_payment).perform()
+
     css_id_row_ymd = "item-"+this_ymd
     css_row_ymd = driver.find_element(By.ID, css_id_row_ymd)
     # driver.execute_script("arguments[0].scrollIntoView();", css_row_ymd)
@@ -107,10 +183,6 @@ def payment_l001(driver):
     css_download.click()
 
 
-
-
-
-
 def main():
     username = "ghb"
     password = "Ghb@12345"
@@ -120,8 +192,8 @@ def main():
         login(driver, username, password)
         time.sleep(5)
 
-        payment_l001(driver)
-        # download_txtfile(driver)
+        payment_l001_new(driver)
+        statement_ghb(driver)
         # time.sleep(3)
 
         #logout(driver)
