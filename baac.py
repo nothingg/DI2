@@ -62,12 +62,18 @@ def payment_l001_new(driver):
 
     css_download_zip = driver.find_element(By.ID, "download_button")
     css_download_zip.click()
+    time.sleep(5)
 
 # Page Detail
 
-    url_date_ymd = "https://unicorn.baac.or.th/ws-payment-l001/" + yesterday.strftime("%Y/%m/%d")
-    driver.get(url_date_ymd)
-    time.sleep(30)
+    # Perform a double click on the element
+    # Perform a double click on the element using JavaScript
+    driver.execute_script("arguments[0].dispatchEvent(new MouseEvent('dblclick', { bubbles: true, cancelable: true }));", span_payment)
+    time.sleep(15)
+
+    # url_date_ymd = "https://unicorn.baac.or.th/ws-payment-l001/" + yesterday.strftime("%Y/%m/%d")
+    # driver.get(url_date_ymd)
+    # time.sleep(30)
 
     file_ymd = yesterday.strftime("%Y%m%d")
     css_download = driver.find_element(By.ID, "download_button_label")
@@ -193,7 +199,7 @@ def main():
         time.sleep(5)
 
         payment_l001_new(driver)
-        statement_ghb(driver)
+        # statement_ghb(driver)
         # time.sleep(3)
 
         #logout(driver)
