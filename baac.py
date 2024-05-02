@@ -40,11 +40,15 @@ def logout(driver):
     logout_link.click()
     time.sleep(3)
 
-def payment_l001_new(driver):
+def payment_l001_new(driver , input_date):
     # https://unicorn.baac.or.th/ws-payment-l001/2024/04/29
-    today = datetime.now()
-    yesterday = today - timedelta(days=1)
-    today_ymd = today.strftime("%Y/%m/%d")
+
+    # Convert input_date to a datetime object
+    input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
+
+    # Find yesterday's date
+    yesterday = input_date_obj - timedelta(days=1)
+    input_date_ymd = input_date_obj.strftime("%Y/%m/%d")
 
 # Page Zip
     url_date_ym = "https://unicorn.baac.or.th/ws-payment-l001/" + yesterday.strftime("%Y/%m")
@@ -52,7 +56,7 @@ def payment_l001_new(driver):
     time.sleep(30)
 
     # Find the element you want to click
-    span_payment = driver.find_element(By.XPATH, f"//span[@class='text_label' and contains(text(), '{today_ymd}')]")
+    span_payment = driver.find_element(By.XPATH, f"//span[@class='text_label' and contains(text(), '{input_date_ymd}')]")
 
     # Scroll the webpage to bring the element into view
     driver.execute_script("arguments[0].scrollIntoView();", span_payment)
@@ -91,11 +95,14 @@ def payment_l001_new(driver):
 
     time.sleep(5)
 
-def statement_ghb(driver):
+def statement_ghb(driver , input_date):
     # https://unicorn.baac.or.th/ws-statement-GHB1/2024/04/29
-    today = datetime.now()
-    yesterday = today - timedelta(days=1)
-    today_ymd = today.strftime("%Y/%m/%d")
+
+    # Convert input_date to a datetime object
+    input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
+
+    # Find yesterday's date
+    yesterday = input_date_obj - timedelta(days=1)
 
     url_date_ym = "https://unicorn.baac.or.th/ws-statement-GHB1/" + yesterday.strftime("%Y/%m/%d")
     driver.get(url_date_ym)
@@ -107,13 +114,11 @@ def statement_ghb(driver):
 
 
     # Find the element you want to click
-    span_payment = driver.find_element(By.XPATH, f"//span[@class='text_label' and contains(text(), '{today_ymd}')]")
-    span_payment.click()
+    # span_payment = driver.find_element(By.XPATH, f"//span[@class='text_label' and contains(text(), '{today_ymd}')]")
+    # span_payment.click()
 
     css_download = driver.find_element(By.ID, "download_button_label")
     css_download.click()
-
-
 
 def payment_l001(driver):
 
@@ -141,7 +146,6 @@ def payment_l001(driver):
 
     time.sleep(15)
 
-    # TODO : Click year month day , and download file
     css_id_row_year = "item-" + this_year
     css_row_year = driver.find_element(By.ID, css_id_row_year)
     actions.double_click(css_row_year).perform()
@@ -154,11 +158,6 @@ def payment_l001(driver):
 
     time.sleep(10)
 
-    # vertical_splitter
-    # content_pane
-    # Option 2: Scroll to the element before clicking
-
-#TODO : connot find id css
     # Find the span element with class "text_label" containing the text "2024/04/02"
     span_payment = driver.find_element(By.XPATH, "//span[@class='text_label' and contains(text(), '2024/04/02')]")
     span_payment.click()
@@ -192,17 +191,18 @@ def payment_l001(driver):
 def main():
     username = "ghb"
     password = "Ghb@12345"
+    input_date = "2024-05-01"
 
     try:
         driver = create_web_driver()
         login(driver, username, password)
         time.sleep(5)
 
-        payment_l001_new(driver)
-        # statement_ghb(driver)
+        payment_l001_new(driver,input_date)
+        statement_ghb(driver,input_date)
         # time.sleep(3)
 
-        #logout(driver)
+        logout(driver)
 
     except Exception as e:
         print('error : ' + str(e))
