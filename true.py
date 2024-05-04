@@ -2,6 +2,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from utils import create_web_driver
 from datetime import datetime, timedelta
+from library.config import source_dir,destination_dir
 
 import time
 import logging
@@ -21,6 +22,13 @@ def login(driver, username, password):
     time.sleep(3)
 
     input_password.send_keys(Keys.ENTER)
+
+
+
+def logout(driver):
+
+    logout_link = driver.find_element(By.CLASS_NAME, "button-logout")
+    logout_link.click()
 
 def select_date(driver, input_date):
 
@@ -48,30 +56,26 @@ def select_date(driver, input_date):
         calendar_date = driver.find_element(By.XPATH, f"//td[@title='{input_date_Mdy}']")
         calendar_date.click()
 
-    time.sleep(2)
+    time.sleep(5)
     btn_search = driver.find_element(By.CLASS_NAME, "primary")
     btn_search.click()
 
-    # input_date_dmy = input_date_obj.strftime("%d/%m/%Y")
-    #
-    # input_calendar = driver.find_element(By.XPATH,"//input[@placeholder='Select date']")
-    # btn_search = driver.find_element(By.CLASS_NAME,"primary")
-    # # btn_search = driver.find_element(By.XPATH, "//button[@class='button primary')]")
-    #
-    # input_calendar.click()
-    # # driver.execute_script("arguments[0].value = '30/04/2024';", input_calendar)
-    # # input_calendar.send_keys(input_date_dmy)
-    #
-    # new_date = "30/04/2024"
-    # driver.execute_script("arguments[0].value = arguments[1];", input_calendar, input_date_dmy)
-    #
-    # # Press the Enter key to trigger the change
-    # input_calendar.send_keys(Keys.RETURN)
-    #
-    # # Wait for the page to update (if necessary)
-    # time.sleep(2)
-    #
-    # btn_search.click()
+
+def download_file(driver , input_date):
+    input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
+    input_date_ymd = input_date_obj.strftime('%Y%m%d')
+
+    txt_file = driver.find_element(By.XPATH, f"//div[@class='name']/span[text()='TRUE{input_date_ymd}01.txt']")
+    txt_file.click()
+    time.sleep(3)
+
+    driver.find_element(By.XPATH, f"//div[@class='name']/span[text()='TMNGHBRPTEW_C101{input_date_ymd}.pdf']").click()
+    time.sleep(3)
+    driver.find_element(By.XPATH, f"//div[@class='name']/span[text()='TMNGHBRPTEW_C102{input_date_ymd}.pdf']").click()
+    time.sleep(3)
+    driver.find_element(By.XPATH, f"//div[@class='name']/span[text()='TMNGHBRPTTRM_C101{input_date_ymd}.pdf']").click()
+    time.sleep(3)
+    driver.find_element(By.XPATH, f"//div[@class='name']/span[text()='TMNGHBRPTTRM_C102{input_date_ymd}.pdf']").click()
 
 def main():
     username = "ghbadmin"
@@ -84,14 +88,18 @@ def main():
         time.sleep(10)
 
         select_date(driver, input_date)
+        time.sleep(10)
 
-        # time.sleep(3)
+        download_file(driver,input_date)
+        time.sleep(10)
 
-        # logout(driver)
+        logout(driver)
+
+        #TODO Move file
 
     except Exception as e:
         print('error : ' + str(e))
-        logging.error(f"An error occurred in BAAC function: {str(e)}")
+        logging.error(f"An error occurred in TRUE function: {str(e)}")
     # finally:
     #     driver.quit()
 
