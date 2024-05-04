@@ -1,6 +1,6 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from utils import create_web_driver
+from utils import create_web_driver,move_files
 from datetime import datetime, timedelta
 from library.config import source_dir,destination_dir
 
@@ -29,6 +29,7 @@ def logout(driver):
 
     logout_link = driver.find_element(By.CLASS_NAME, "button-logout")
     logout_link.click()
+
 
 def select_date(driver, input_date):
 
@@ -96,7 +97,7 @@ def main():
         logout(driver)
 
         #TODO Move file
-
+        move_files(source_dir["default"], destination_dir["true"])
     except Exception as e:
         print('error : ' + str(e))
         logging.error(f"An error occurred in TRUE function: {str(e)}")
