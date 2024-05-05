@@ -11,6 +11,10 @@ import time
 import logging
 
 
+# Configure logging
+logging.basicConfig(filename='error.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s')
+
+
 def login(driver):
     driver.get("https://easypay.lotuss.com/")
 
@@ -18,11 +22,11 @@ def login(driver):
     WebDriverWait(driver, WAIT_TIME).until(EC.frame_to_be_available_and_switch_to_it("mainFrame"))
 
     # Find the username, password, and secret code input fields
-    input_username = WebDriverWait(driver, 10).until(
+    input_username = WebDriverWait(driver, WAIT_INTERVAL).until(
         EC.element_to_be_clickable((By.XPATH, "//input[@name='formLogin:j_id_jsp_177548282_4']")))
-    input_password = WebDriverWait(driver, 10).until(
+    input_password = WebDriverWait(driver, WAIT_INTERVAL).until(
         EC.element_to_be_clickable((By.XPATH, "//input[@name='formLogin:j_id_jsp_177548282_5']")))
-    input_secret_code = WebDriverWait(driver, 10).until(
+    input_secret_code = WebDriverWait(driver, WAIT_INTERVAL).until(
         EC.element_to_be_clickable((By.XPATH, "//input[@name='formLogin:j_id_jsp_177548282_6']")))
 
     # Send keys to all input fields
@@ -64,9 +68,13 @@ def download_summary(driver, input_date):
         EC.element_to_be_clickable((By.XPATH, "//img[@src='images/icon_store_summary.png']")))
     summary_link.click()
 
+    # TODO : Check XPath again. It's use ByName more Xpath
     # Select Report in dropdownlist
-    dropdown = WebDriverWait(driver, WAIT_TIME).until(
-        EC.presence_of_element_located((By.NAME, "frmBillerMonitor:j_id_jsp_WAIT_TIME8231391_10")))
+    dropdown = WebDriverWait(driver, WAIT_INTERVAL).until(
+        EC.element_to_be_clickable((By.XPATH, "//*[@id='frmBillerMonitor']/table[1]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr[5]/td/table/tbody/tr/td[2]/div/select")))
+    # dropdown = WebDriverWait(driver, WAIT_TIME).until(
+    #     EC.element_to_be_clickable((By.NAME, "frmBillerMonitor:j_id_jsp_WAIT_TIME8231391_10")))
+    # dropdown = driver.find_element(By.NAME, "frmBillerMonitor:j_id_jsp_108231391_10")
 
     # Create a Select object
     select = Select(dropdown)
@@ -102,15 +110,15 @@ def main():
     try:
         driver = create_web_driver()
         login(driver)
-        # download_zip(driver, input_date)
+        download_zip(driver, input_date)
         download_summary(driver,input_date)
-        # logout(driver)
-        # time.sleep(3)
-        # move_files(source_dir["default"], destination_dir["lotus"])
+        logout(driver)
+        time.sleep(3)
+        move_files(source_dir["default"], destination_dir["lotus"])
 
     except Exception as e:
         print('error : ' + str(e))
-        logging.error(f"An error occurred in TRUE function: {str(e)}")
+        logging.error(f"An error occurred in Lotus function: {str(e)}")
     # finally:
     #     driver.quit()
 

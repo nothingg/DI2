@@ -3,6 +3,7 @@ from selenium.webdriver.common.keys import Keys
 from datetime import datetime
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 
 from utils import create_web_driver,move_files
 from library.config import source_dir,destination_dir,username,password,secret_code,WAIT_TIME,WAIT_INTERVAL
@@ -11,27 +12,42 @@ import time
 import logging
 
 
+# Configure logging
+logging.basicConfig(filename='error.log', level=logging.ERROR, format='%(filename)s - %(asctime)s - %(levelname)s - %(funcName)s - %(message)s')
+
+# TODO : Test Exception & logging , timeout and other
 def login(driver):
-    # Perform login with provided credentials
-    driver.get("https://pago.truecorp.co.th/tmnos-wdl/ghb")
+    try:
+        # Perform login with provided credentials
+        driver.get("https://pago.truecorp.co.th/tmnos-wdl/ghb")
 
-    # Wait for the input fields to be clickable
-    input_username = WebDriverWait(driver, WAIT_TIME).until(
-        EC.element_to_be_clickable((By.XPATH, "//input[@type='text' and @placeholder='Username' and @autocomplete='off']")))
-    input_password = WebDriverWait(driver, WAIT_TIME).until(
-        EC.element_to_be_clickable((By.XPATH, "//input[@type='password' and @placeholder='Password' and @autocomplete='off']")))
+        #driver.find_element(By.NAME, "userid")
+        # Wait for the input fields to be clickable
+        input_username = WebDriverWait(driver, WAIT_TIME).until(
+            EC.element_to_be_clickable((By.XPATH, "//input[@type='text' and @placeholder='Username1' and @autocomplete='off']")))
+        input_password = WebDriverWait(driver, WAIT_TIME).until(
+            EC.element_to_be_clickable((By.XPATH, "//input[@type='password' and @placeholder='Password1' and @autocomplete='off']")))
 
-    # Enter the username and password
-    input_username.send_keys(username["true"])
-    input_password.send_keys(password["true"])
-    input_password.send_keys(Keys.ENTER)
+        # Enter the username and password
+        input_username.send_keys(username["true"])
+        input_password.send_keys(password["true"])
+        input_password.send_keys(Keys.ENTER)
 
-    # Wait for 3 seconds (if needed, you can replace this with WebDriverWait as well)
-    # WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, "//input[@type='password' and @placeholder='Password' and @autocomplete='off']")))
+        # Wait for 3 seconds (if needed, you can replace this with WebDriverWait as well)
+        # WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, "//input[@type='password' and @placeholder='Password' and @autocomplete='off']")))
+    except TimeoutException:
+        # Handle TimeoutException
+        logging.error("Timeout occurred while waiting for element to be clickable.")
+    except Exception as e:
+        error_message = str(e)
+        logging.error(f"An error occurred: {error_message}")
+
+        # logging.error(f"An error occurred : {str(e)}")
+        # logging.error("An error occurred:", exc_info=True)
 
 def logout(driver):
     btn_logout = WebDriverWait(driver, WAIT_TIME).until(
-        EC.element_to_be_clickable(By.CLASS_NAME, "button-logout"))
+        EC.element_to_be_clickable((By.CLASS_NAME, "button-logout")))
     btn_logout.click()
 
 
@@ -85,15 +101,15 @@ def main():
     try:
         driver = create_web_driver()
         login(driver)
-        select_date(driver, input_date)
-        download_file(driver,input_date)
-        logout(driver)
-        move_files(source_dir["default"], destination_dir["true"])
+        # select_date(driver, input_date)
+        # download_file(driver,input_date)
+        # logout(driver)
+        # move_files(source_dir["default"], destination_dir["true"])
     except Exception as e:
-        # print('error : ' + str(e))
+        print('error : ' + str(e))
         logging.error(f"An error occurred in TRUE function: {str(e)}")
-    finally:
-        driver.quit()
+    # finally:
+    #     driver.quit()
 
 if __name__ == "__main__":
     main()
