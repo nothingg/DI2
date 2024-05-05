@@ -9,5 +9,27 @@ pre_destination_dir = "D:/_GHB"
 destination_dir = {
     "counter_service": pre_destination_dir + "/Python/DI2/download/counter_service",
     "mpay": pre_destination_dir + "/Python/DI2/download/mpay",
-    "true": pre_destination_dir + "/Python/DI2/download/true"
+    "true": pre_destination_dir + "/Python/DI2/download/true",
+    "lotus": pre_destination_dir + "/Python/DI2/download/lotus",
 }
+
+username = {
+    "counter_service": "ghb",
+    "mpay": "govebank",
+    "true": "ghbadmin",
+    "lotus" : "GHB0001"
+}
+
+password = {
+    "counter_service": "ghbwyq444444",
+    "mpay": "G0veB@nK",
+    "true": "ghbpassword",
+    "lotus" : "pASSWORD@36"
+}
+
+secret_code = {
+    "lotus" : "3520000101"
+}
+
+WAIT_TIME = 10  # Maximum wait time in seconds
+WAIT_INTERVAL = 1  # Interval between wait checks in seconds
