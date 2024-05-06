@@ -16,7 +16,6 @@ import sys
 # Configure logging
 logging.basicConfig(filename='error.log', level=logging.ERROR, format='%(filename)s - %(asctime)s - %(levelname)s - %(funcName)s - %(message)s')
 
-# TODO : Test Exception & logging , timeout and other
 def login(driver):
     try:
         # Perform login with provided credentials
@@ -139,8 +138,8 @@ def main():
         print('error : ' + str(e))
         logging.error(f"An error occurred in TRUE function: {str(e)}")
         sys.exit(1)  # Exit the program with an error code
-    # finally:
-    #     driver.quit()
+    finally:
+        driver.quit()
 
 if __name__ == "__main__":
     main()

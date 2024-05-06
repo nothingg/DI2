@@ -3,124 +3,155 @@ from selenium.webdriver.common.keys import Keys
 from datetime import datetime
 from selenium.webdriver.support.ui import WebDriverWait , Select
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 
 from utils import create_web_driver,move_files
 from library.config import source_dir,destination_dir,username,password,secret_code,WAIT_TIME,WAIT_INTERVAL
 
 import time
 import logging
-
+import sys
 
 # Configure logging
 logging.basicConfig(filename='error.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s')
 
 
 def login(driver):
-    driver.get("https://easypay.lotuss.com/")
+    try :
+        driver.get("https://easypay.lotuss.com/")
 
-    # Switch to the frame
-    WebDriverWait(driver, WAIT_TIME).until(EC.frame_to_be_available_and_switch_to_it("mainFrame"))
+        # Switch to the frame
+        WebDriverWait(driver, WAIT_TIME).until(EC.frame_to_be_available_and_switch_to_it("mainFrame"))
 
-    # Find the username, password, and secret code input fields
-    input_username = WebDriverWait(driver, WAIT_INTERVAL).until(
-        EC.element_to_be_clickable((By.XPATH, "//input[@name='formLogin:j_id_jsp_177548282_4']")))
-    input_password = WebDriverWait(driver, WAIT_INTERVAL).until(
-        EC.element_to_be_clickable((By.XPATH, "//input[@name='formLogin:j_id_jsp_177548282_5']")))
-    input_secret_code = WebDriverWait(driver, WAIT_INTERVAL).until(
-        EC.element_to_be_clickable((By.XPATH, "//input[@name='formLogin:j_id_jsp_177548282_6']")))
+        # Find the username, password, and secret code input fields
+        input_username = WebDriverWait(driver, WAIT_INTERVAL).until(
+            EC.element_to_be_clickable((By.XPATH, "//input[@name='formLogin:j_id_jsp_177548282_4']")))
+        input_password = WebDriverWait(driver, WAIT_INTERVAL).until(
+            EC.element_to_be_clickable((By.XPATH, "//input[@name='formLogin:j_id_jsp_177548282_5']")))
+        input_secret_code = WebDriverWait(driver, WAIT_INTERVAL).until(
+            EC.element_to_be_clickable((By.XPATH, "//input[@name='formLogin:j_id_jsp_177548282_6']")))
 
-    # Send keys to all input fields
-    input_username.send_keys(username["lotus"])
-    input_password.send_keys(password["lotus"])
-    input_secret_code.send_keys(secret_code["lotus"])
+        # Send keys to all input fields
+        input_username.send_keys(username["lotus"])
+        input_password.send_keys(password["lotus"])
+        input_secret_code.send_keys(secret_code["lotus"])
 
-    # Submit the form by pressing Enter on the secret code field
-    input_secret_code.send_keys(Keys.ENTER)
+        # Submit the form by pressing Enter on the secret code field
+        input_secret_code.send_keys(Keys.ENTER)
+
+    except TimeoutException as t:
+        # Handle TimeoutException
+        logging.error("True : Timeout occurred while waiting for element to be clickable." , exc_info=True)
+        sys.exit(1)  # Exit the program with an error code
+    except Exception as e:
+        error_message = str(e)
+        logging.error(f"True : An error occurred: {error_message}")
+        sys.exit(1)  # Exit the program with an error code
 
 def logout(driver):
-    btn_logout = WebDriverWait(driver, WAIT_TIME).until(
-        EC.element_to_be_clickable((By.XPATH, "//img[@src='images/icon_logout.png']")))
-    btn_logout.click()
+    try :
+        btn_logout = WebDriverWait(driver, WAIT_TIME).until(
+            EC.element_to_be_clickable((By.XPATH, "//img[@src='images/icon_logout.png']")))
+        btn_logout.click()
+
+    except TimeoutException as t:
+        # Handle TimeoutException
+        logging.error("True : Timeout occurred while waiting for element to be clickable." , exc_info=True)
+        sys.exit(1)  # Exit the program with an error code
+    except Exception as e:
+        error_message = str(e)
+        logging.error(f"True : An error occurred: {error_message}")
+        sys.exit(1)  # Exit the program with an error code
 
 def download_zip(driver, input_date):
+    try :
+        input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
+        input_date_dmy = input_date_obj.strftime('%d%m%y')
 
-    input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
-    input_date_dmy = input_date_obj.strftime('%d%m%y')
+        menu_link = WebDriverWait(driver, WAIT_TIME).until(
+            EC.element_to_be_clickable((By.XPATH, "//img[@src='images/icon_report.png']")))
+        menu_link.click()
 
-    menu_link = WebDriverWait(driver, WAIT_TIME).until(
-        EC.element_to_be_clickable((By.XPATH, "//img[@src='images/icon_report.png']")))
-    menu_link.click()
+        zip_download = WebDriverWait(driver, WAIT_TIME).until(
+            EC.element_to_be_clickable((By.XPATH, f"//a[text()='TES_GHB_ALL_{input_date_dmy}_{input_date_dmy}.zip']")))
+        zip_download.click()
 
-    zip_download = WebDriverWait(driver, WAIT_TIME).until(
-        EC.element_to_be_clickable((By.XPATH, f"//a[text()='TES_GHB_ALL_{input_date_dmy}_{input_date_dmy}.zip']")))
-    zip_download.click()
-
+    except TimeoutException as t:
+        # Handle TimeoutException
+        logging.error("True : Timeout occurred while waiting for element to be clickable." , exc_info=True)
+        sys.exit(1)  # Exit the program with an error code
+    except Exception as e:
+        error_message = str(e)
+        logging.error(f"True : An error occurred: {error_message}")
+        sys.exit(1)  # Exit the program with an error code
 def download_summary(driver, input_date):
+    try :
+        input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
+        input_date_dmy = input_date_obj.strftime('%d/%m/%Y')
 
-    input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
-    input_date_dmy = input_date_obj.strftime('%d/%m/%Y')
+        home_link = WebDriverWait(driver, WAIT_TIME).until(
+            EC.element_to_be_clickable((By.XPATH, "//img[@src='images/icon_home.png']")))
+        home_link.click()
 
-    home_link = WebDriverWait(driver, WAIT_TIME).until(
-        EC.element_to_be_clickable((By.XPATH, "//img[@src='images/icon_home.png']")))
-    home_link.click()
+        summary_link = WebDriverWait(driver, WAIT_TIME).until(
+            EC.element_to_be_clickable((By.XPATH, "//img[@src='images/icon_store_summary.png']")))
+        summary_link.click()
 
-    summary_link = WebDriverWait(driver, WAIT_TIME).until(
-        EC.element_to_be_clickable((By.XPATH, "//img[@src='images/icon_store_summary.png']")))
-    summary_link.click()
+        # Select Report in dropdownlist
+        dropdown = WebDriverWait(driver, WAIT_TIME).until(
+            EC.element_to_be_clickable((By.NAME, "frmBillerMonitor:j_id_jsp_108231391_10")))
 
-    # TODO : Check XPath again. It's use ByName more Xpath
-    # Select Report in dropdownlist
-    dropdown = WebDriverWait(driver, WAIT_INTERVAL).until(
-        EC.element_to_be_clickable((By.XPATH, "//*[@id='frmBillerMonitor']/table[1]/tbody/tr/td/table[1]/tbody/tr/td/table/tbody/tr[5]/td/table/tbody/tr/td[2]/div/select")))
-    # dropdown = WebDriverWait(driver, WAIT_TIME).until(
-    #     EC.element_to_be_clickable((By.NAME, "frmBillerMonitor:j_id_jsp_WAIT_TIME8231391_10")))
-    # dropdown = driver.find_element(By.NAME, "frmBillerMonitor:j_id_jsp_108231391_10")
+        # Create a Select object
+        select = Select(dropdown)
 
-    # Create a Select object
-    select = Select(dropdown)
+        # Select the option by its value
+        select.select_by_value("RPTHO019")
 
-    # Select the option by its value
-    select.select_by_value("RPTHO019")
+        start_date = WebDriverWait(driver, WAIT_TIME).until(
+            EC.presence_of_element_located((By.ID,"frmBillerMonitor:selectStartDate")))
 
-    start_date = WebDriverWait(driver, WAIT_TIME).until(
-        EC.presence_of_element_located((By.ID,"frmBillerMonitor:selectStartDate")))
+        end_date = WebDriverWait(driver, WAIT_TIME).until(
+            EC.presence_of_element_located((By.ID, "frmBillerMonitor:selectEndDate")))
 
-    end_date = WebDriverWait(driver, WAIT_TIME).until(
-        EC.presence_of_element_located((By.ID, "frmBillerMonitor:selectEndDate")))
+        btn_search = WebDriverWait(driver, WAIT_TIME).until(
+            EC.element_to_be_clickable((By.XPATH, "//img[@src='images/cmd_search_mout.gif']")))
 
-    btn_search = WebDriverWait(driver, WAIT_TIME).until(
-        EC.element_to_be_clickable((By.XPATH, "//img[@src='images/cmd_search_mout.gif']")))
+        start_date.clear()
+        end_date.clear()
+        start_date.send_keys(input_date_dmy)
+        end_date.send_keys(input_date_dmy)
+        btn_search.click()
 
-    start_date.clear()
-    end_date.clear()
-    start_date.send_keys(input_date_dmy)
-    end_date.send_keys(input_date_dmy)
-    btn_search.click()
+        #ที่เอาไว้ตรงนี้เพราะต้องกด btn serach ก่อนแล้วหน้าจะ refresh แล้วค่อยค้นหา btn export
+        btn_export = WebDriverWait(driver, WAIT_TIME).until(
+            EC.element_to_be_clickable((By.XPATH, "//img[@src='images/icon_export.png']")))
+        btn_export.click()
 
-    #ที่เอาไว้ตรงนี้เพราะต้องกด btn serach ก่อนแล้วหน้าจะ refresh แล้วค่อยค้นหา btn export
-    btn_export = WebDriverWait(driver, WAIT_TIME).until(
-        EC.element_to_be_clickable((By.XPATH, "//img[@src='images/icon_export.png']")))
-    btn_export.click()
-
+    except TimeoutException as t:
+        # Handle TimeoutException
+        logging.error("True : Timeout occurred while waiting for element to be clickable." , exc_info=True)
+        sys.exit(1)  # Exit the program with an error code
+    except Exception as e:
+        error_message = str(e)
+        logging.error(f"True : An error occurred: {error_message}")
+        sys.exit(1)  # Exit the program with an error code
 
 def main():
-
     input_date = "2024-04-30"
-
     try:
         driver = create_web_driver()
         login(driver)
-        # download_zip(driver, input_date)
+        download_zip(driver, input_date)
         download_summary(driver,input_date)
-        # logout(driver)
-        # time.sleep(3)
-        # move_files(source_dir["default"], destination_dir["lotus"])
+        logout(driver)
+        move_files(source_dir["default"], destination_dir["lotus"])
 
     except Exception as e:
         print('error : ' + str(e))
         logging.error(f"An error occurred in Lotus function: {str(e)}")
-    # finally:
-    #     driver.quit()
+        sys.exit(1)  # Exit the program with an error code
+    finally:
+        driver.quit()
 
 if __name__ == "__main__":
     main()
