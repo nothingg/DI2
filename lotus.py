@@ -110,11 +110,11 @@ def main():
     try:
         driver = create_web_driver()
         login(driver)
-        download_zip(driver, input_date)
+        # download_zip(driver, input_date)
         download_summary(driver,input_date)
-        logout(driver)
-        time.sleep(3)
-        move_files(source_dir["default"], destination_dir["lotus"])
+        # logout(driver)
+        # time.sleep(3)
+        # move_files(source_dir["default"], destination_dir["lotus"])
 
     except Exception as e:
         print('error : ' + str(e))

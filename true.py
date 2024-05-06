@@ -10,6 +10,7 @@ from library.config import source_dir,destination_dir,username,password,secret_c
 
 import time
 import logging
+import sys
 
 
 # Configure logging
@@ -21,12 +22,11 @@ def login(driver):
         # Perform login with provided credentials
         driver.get("https://pago.truecorp.co.th/tmnos-wdl/ghb")
 
-        #driver.find_element(By.NAME, "userid")
         # Wait for the input fields to be clickable
         input_username = WebDriverWait(driver, WAIT_TIME).until(
-            EC.element_to_be_clickable((By.XPATH, "//input[@type='text' and @placeholder='Username1' and @autocomplete='off']")))
+            EC.element_to_be_clickable((By.XPATH, "//input[@type='text' and @placeholder='Username' and @autocomplete='off']")))
         input_password = WebDriverWait(driver, WAIT_TIME).until(
-            EC.element_to_be_clickable((By.XPATH, "//input[@type='password' and @placeholder='Password1' and @autocomplete='off']")))
+            EC.element_to_be_clickable((By.XPATH, "//input[@type='password' and @placeholder='Password' and @autocomplete='off']")))
 
         # Enter the username and password
         input_username.send_keys(username["true"])
@@ -35,65 +35,95 @@ def login(driver):
 
         # Wait for 3 seconds (if needed, you can replace this with WebDriverWait as well)
         # WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, "//input[@type='password' and @placeholder='Password' and @autocomplete='off']")))
-    except TimeoutException:
+    except TimeoutException as t:
         # Handle TimeoutException
-        logging.error("Timeout occurred while waiting for element to be clickable.")
+        logging.error("True : Timeout occurred while waiting for element to be clickable." , exc_info=True)
+        sys.exit(1)  # Exit the program with an error code
     except Exception as e:
         error_message = str(e)
-        logging.error(f"An error occurred: {error_message}")
-
-        # logging.error(f"An error occurred : {str(e)}")
-        # logging.error("An error occurred:", exc_info=True)
+        logging.error(f"True : An error occurred: {error_message}")
+        sys.exit(1)  # Exit the program with an error code
 
 def logout(driver):
-    btn_logout = WebDriverWait(driver, WAIT_TIME).until(
-        EC.element_to_be_clickable((By.CLASS_NAME, "button-logout")))
-    btn_logout.click()
+    try :
+        btn_logout = WebDriverWait(driver, WAIT_TIME).until(
+            EC.element_to_be_clickable((By.CLASS_NAME, "button-logout")))
+        btn_logout.click()
+    except TimeoutException as t:
+        # Handle TimeoutException
+        logging.error("True : Timeout occurred while waiting for element to be clickable.", exc_info=True)
+        sys.exit(1)  # Exit the program with an error code
+    except Exception as e:
+        error_message = str(e)
+        logging.error(f"True : An error occurred: {error_message}")
+        sys.exit(1)  # Exit the program with an error code
+
 
 
 def select_date(driver, input_date):
+    try :
+        input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
+        input_date_Mdy = input_date_obj.strftime('%B %d, %Y')
 
-    input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
-    input_date_Mdy = input_date_obj.strftime('%B %d, %Y')
+        # input_calendar = WebDriverWait(driver, WAIT_TIME).until(
+        #     EC.presence_of_element_located((By.XPATH, "//*[@id='root-route']/div/div/div[3]/div/section[1]/div/span/div/input")))
+        input_calendar = WebDriverWait(driver, WAIT_TIME).until(
+            EC.element_to_be_clickable((By.XPATH, "//input[@placeholder='Select date']")))
+        time.sleep(WAIT_TIME)
+        input_calendar.click()
 
-    input_calendar = WebDriverWait(driver, WAIT_TIME).until(EC.element_to_be_clickable((By.XPATH, "//input[@placeholder='Select date']")))
-    input_calendar.click()
+        # Check if input date is in the present month
+        if input_date_obj.month != datetime.now().month:
+            # Calculate the number of clicks needed to navigate to the previous month
+            num_clicks = abs(input_date_obj.month - datetime.now().month)
 
-    # Check if input date is in the present month
-    if input_date_obj.month != datetime.now().month:
-        # Calculate the number of clicks needed to navigate to the previous month
-        num_clicks = abs(input_date_obj.month - datetime.now().month)
+            # Click on the 'Previous month' button 'num_clicks' times
+            for _ in range(num_clicks):
+                prev_month_button = WebDriverWait(driver, WAIT_TIME).until(EC.element_to_be_clickable((By.CLASS_NAME, "ant-calendar-prev-month-btn")))
+                prev_month_button.click()
 
-        # Click on the 'Previous month' button 'num_clicks' times
-        for _ in range(num_clicks):
-            prev_month_button = WebDriverWait(driver, WAIT_TIME).until(EC.element_to_be_clickable((By.CLASS_NAME, "ant-calendar-prev-month-btn")))
-            prev_month_button.click()
+        # Locate and click on the calendar date element
+        calendar_date = WebDriverWait(driver, WAIT_TIME).until(EC.element_to_be_clickable((By.XPATH, f"//td[@title='{input_date_Mdy}']")))
+        calendar_date.click()
 
-    # Locate and click on the calendar date element
-    calendar_date = WebDriverWait(driver, WAIT_TIME).until(EC.element_to_be_clickable((By.XPATH, f"//td[@title='{input_date_Mdy}']")))
-    calendar_date.click()
-
-    # Click the search button
-    btn_search = WebDriverWait(driver, WAIT_TIME).until(EC.element_to_be_clickable((By.CLASS_NAME, "primary")))
-    btn_search.click()
+        # Click the search button
+        btn_search = WebDriverWait(driver, WAIT_TIME).until(EC.element_to_be_clickable((By.CLASS_NAME, "primary")))
+        btn_search.click()
+    except TimeoutException as t:
+        # Handle TimeoutException
+        logging.error("True : Timeout occurred while waiting for element to be clickable." , exc_info=True)
+        sys.exit(1)  # Exit the program with an error code
+    except Exception as e:
+        error_message = str(e)
+        logging.error(f"True : An error occurred: {error_message}")
+        sys.exit(1)  # Exit the program with an error code
 
 def download_file(driver, input_date):
-    input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
-    input_date_ymd = input_date_obj.strftime('%Y%m%d')
-    file_names = [
-        f"TRUE{input_date_ymd}01.txt",
-        f"TMNGHBRPTEW_C101{input_date_ymd}.pdf",
-        f"TMNGHBRPTEW_C102{input_date_ymd}.pdf",
-        f"TMNGHBRPTTRM_C101{input_date_ymd}.pdf",
-        f"TMNGHBRPTTRM_C102{input_date_ymd}.pdf"
-    ]
+    try :
+        input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
+        input_date_ymd = input_date_obj.strftime('%Y%m%d')
+        file_names = [
+            f"TRUE{input_date_ymd}01.txt",
+            f"TMNGHBRPTEW_C101{input_date_ymd}.pdf",
+            f"TMNGHBRPTEW_C102{input_date_ymd}.pdf",
+            f"TMNGHBRPTTRM_C101{input_date_ymd}.pdf",
+            f"TMNGHBRPTTRM_C102{input_date_ymd}.pdf"
+        ]
 
-    for file_name in file_names:
-        file_xpath = f"//div[@class='name']/span[text()='{file_name}']"
-        file_element = WebDriverWait(driver, WAIT_TIME).until(EC.element_to_be_clickable((By.XPATH, file_xpath)))
-        file_element.click()
+        for file_name in file_names:
+            file_xpath = f"//div[@class='name']/span[text()='{file_name}']"
+            file_element = WebDriverWait(driver, WAIT_TIME).until(EC.element_to_be_clickable((By.XPATH, file_xpath)))
+            file_element.click()
 
-        time.sleep(WAIT_INTERVAL)
+            time.sleep(WAIT_INTERVAL)
+    except TimeoutException as t:
+        # Handle TimeoutException
+        logging.error("True : Timeout occurred while waiting for element to be clickable." , exc_info=True)
+        sys.exit(1)  # Exit the program with an error code
+    except Exception as e:
+        error_message = str(e)
+        logging.error(f"True : An error occurred: {error_message}")
+        sys.exit(1)  # Exit the program with an error code
 
 def main():
     input_date = "2024-04-30"
@@ -101,13 +131,14 @@ def main():
     try:
         driver = create_web_driver()
         login(driver)
-        # select_date(driver, input_date)
-        # download_file(driver,input_date)
-        # logout(driver)
-        # move_files(source_dir["default"], destination_dir["true"])
+        select_date(driver, input_date)
+        download_file(driver,input_date)
+        logout(driver)
+        move_files(source_dir["default"], destination_dir["true"])
     except Exception as e:
         print('error : ' + str(e))
         logging.error(f"An error occurred in TRUE function: {str(e)}")
+        sys.exit(1)  # Exit the program with an error code
     # finally:
     #     driver.quit()
 
