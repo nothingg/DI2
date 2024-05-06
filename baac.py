@@ -35,8 +35,7 @@ def login(driver):
         logging.error("BAAC : Timeout occurred while waiting for element to be clickable." , exc_info=True)
         sys.exit(1)  # Exit the program with an error code
     except Exception as e:
-        error_message = str(e)
-        logging.error(f"BAAC : An error occurred: {error_message}")
+        logging.error(f"BAAC: An error occurred: {str(e)}", exc_info=True)
         sys.exit(1)  # Exit the program with an error code
 
 def logout(driver):
@@ -55,21 +54,16 @@ def logout(driver):
         logout_link.click()
 
     except TimeoutException as t:
-        # Handle TimeoutException
         logging.error("BAAC : Timeout occurred while waiting for element to be clickable." , exc_info=True)
         sys.exit(1)  # Exit the program with an error code
     except Exception as e:
-        error_message = str(e)
-        logging.error(f"BAAC : An error occurred: {error_message}")
+        logging.error(f"BAAC: An error occurred: {str(e)}", exc_info=True)
         sys.exit(1)  # Exit the program with an error code
 
 
 def payment_l001_new(driver, input_date):
     try :
-        # Convert input_date to a datetime object
         input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
-
-        # Find yesterday's date
         yesterday = input_date_obj - timedelta(days=1)
         input_date_ymd = input_date_obj.strftime("%Y/%m/%d")
 
@@ -117,8 +111,7 @@ def payment_l001_new(driver, input_date):
         logging.error("BAAC : Timeout occurred while waiting for element to be clickable." , exc_info=True)
         sys.exit(1)  # Exit the program with an error code
     except Exception as e:
-        error_message = str(e)
-        logging.error(f"BAAC : An error occurred: {error_message}")
+        logging.error(f"BAAC: An error occurred: {str(e)}", exc_info=True)
         sys.exit(1)  # Exit the program with an error code
 
 def statement_ghb(driver, input_date):
@@ -144,8 +137,7 @@ def statement_ghb(driver, input_date):
         logging.error("BAAC : Timeout occurred while waiting for element to be clickable." , exc_info=True)
         sys.exit(1)  # Exit the program with an error code
     except Exception as e:
-        error_message = str(e)
-        logging.error(f"BAAC : An error occurred: {error_message}")
+        logging.error(f"BAAC: An error occurred: {str(e)}", exc_info=True)
         sys.exit(1)  # Exit the program with an error code
 
 def main():

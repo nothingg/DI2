@@ -15,6 +15,7 @@ import sys
 # Configure logging
 logging.basicConfig(filename='error.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s')
 
+# TODO : Change from WAIT_TIME,WAIT_INTERVAL to  WAIT_TIMES
 
 def login(driver):
     try :
