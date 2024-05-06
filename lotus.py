@@ -41,11 +41,11 @@ def login(driver):
 
     except TimeoutException as t:
         # Handle TimeoutException
-        logging.error("True : Timeout occurred while waiting for element to be clickable." , exc_info=True)
+        logging.error("Lotus : Timeout occurred while waiting for element to be clickable." , exc_info=True)
         sys.exit(1)  # Exit the program with an error code
     except Exception as e:
         error_message = str(e)
-        logging.error(f"True : An error occurred: {error_message}")
+        logging.error(f"Lotus : An error occurred: {error_message}")
         sys.exit(1)  # Exit the program with an error code
 
 def logout(driver):
@@ -56,11 +56,11 @@ def logout(driver):
 
     except TimeoutException as t:
         # Handle TimeoutException
-        logging.error("True : Timeout occurred while waiting for element to be clickable." , exc_info=True)
+        logging.error("Lotus : Timeout occurred while waiting for element to be clickable." , exc_info=True)
         sys.exit(1)  # Exit the program with an error code
     except Exception as e:
         error_message = str(e)
-        logging.error(f"True : An error occurred: {error_message}")
+        logging.error(f"Lotus : An error occurred: {error_message}")
         sys.exit(1)  # Exit the program with an error code
 
 def download_zip(driver, input_date):
@@ -78,11 +78,11 @@ def download_zip(driver, input_date):
 
     except TimeoutException as t:
         # Handle TimeoutException
-        logging.error("True : Timeout occurred while waiting for element to be clickable." , exc_info=True)
+        logging.error("Lotus : Timeout occurred while waiting for element to be clickable." , exc_info=True)
         sys.exit(1)  # Exit the program with an error code
     except Exception as e:
         error_message = str(e)
-        logging.error(f"True : An error occurred: {error_message}")
+        logging.error(f"Lotus : An error occurred: {error_message}")
         sys.exit(1)  # Exit the program with an error code
 def download_summary(driver, input_date):
     try :
@@ -129,11 +129,11 @@ def download_summary(driver, input_date):
 
     except TimeoutException as t:
         # Handle TimeoutException
-        logging.error("True : Timeout occurred while waiting for element to be clickable." , exc_info=True)
+        logging.error("Lotus : Timeout occurred while waiting for element to be clickable." , exc_info=True)
         sys.exit(1)  # Exit the program with an error code
     except Exception as e:
         error_message = str(e)
-        logging.error(f"True : An error occurred: {error_message}")
+        logging.error(f"Lotus : An error occurred: {error_message}")
         sys.exit(1)  # Exit the program with an error code
 
 def main():

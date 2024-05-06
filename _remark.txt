@@ -1,0 +1,9 @@
+input_username = driver.find_element(By.NAME, "userid")
+
+btn_search = WebDriverWait(driver, WAIT_TIME).until(
+    EC.element_to_be_clickable((By.CLASS_NAME, "primary")))
+
+input_calendar = WebDriverWait(driver, WAIT_TIME).until(
+    EC.presence_of_element_located((By.XPATH, "//*[@id='root-route']/div/div/div[3]/div/section[1]/div/span/div/input")))
+
+

@@ -17,14 +17,16 @@ username = {
     "counter_service": "ghb",
     "mpay": "govebank",
     "true": "ghbadmin",
-    "lotus" : "GHB0001"
+    "lotus" : "GHB0001",
+    "baac" : "ghb"
 }
 
 password = {
     "counter_service": "ghbwyq444444",
     "mpay": "G0veB@nK",
     "true": "ghbpassword",
-    "lotus" : "pASSWORD@36"
+    "lotus" : "pASSWORD@36",
+    "baac" : "Ghb@12345"
 }
 
 secret_code = {
@@ -33,3 +35,11 @@ secret_code = {
 
 WAIT_TIME = 10  # Maximum wait time in seconds
 WAIT_INTERVAL = 1  # Interval between wait checks in seconds
+WAIT_LONG_TIME = 30
+
+WAIT_TIMES = {
+    "1" : 1,
+    "5" : 5,
+    "10" : 10,
+    "30" : 30,
+}

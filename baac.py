@@ -1,214 +1,173 @@
+from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
-from utils import create_web_driver , move_files
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
 from datetime import datetime, timedelta
+from selenium.webdriver.support.ui import WebDriverWait , Select
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+
+from utils import create_web_driver,move_files
+from library.config import source_dir,destination_dir,username,password,secret_code,WAIT_TIMES
 
 import time
 import logging
+import sys
 
 # Configure logging
 logging.basicConfig(filename='error.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s')
 
-def login(driver, username, password):
-    # Perform login with provided credentials
-    driver.get("https://unicorn.baac.or.th/")
+def login(driver):
+    try :
+        driver.get("https://unicorn.baac.or.th/")
+        time.sleep(WAIT_TIMES["10"])
 
-    time.sleep(5)
+        input_username = WebDriverWait(driver, WAIT_TIMES["10"]).until(
+            EC.visibility_of_element_located((By.NAME, "userid")))
+        input_password = WebDriverWait(driver, WAIT_TIMES["10"]).until(
+            EC.visibility_of_element_located((By.NAME, "password")))
 
-    input_username = driver.find_element(By.NAME, "userid")
-    input_password = driver.find_element(By.NAME, "password")
+        input_username.send_keys(username["baac"])
+        input_password.send_keys(password["baac"])
+        input_password.send_keys(Keys.ENTER)
 
-    input_username.send_keys(username)
-    input_password.send_keys(password)
-    time.sleep(3)
-
-    input_password.send_keys(Keys.ENTER)
+    except TimeoutException as t:
+        # Handle TimeoutException
+        logging.error("BAAC : Timeout occurred while waiting for element to be clickable." , exc_info=True)
+        sys.exit(1)  # Exit the program with an error code
+    except Exception as e:
+        error_message = str(e)
+        logging.error(f"BAAC : An error occurred: {error_message}")
+        sys.exit(1)  # Exit the program with an error code
 
 def logout(driver):
-    # Logout from the system
-    main_menu = driver.find_element(By.ID,"logging_string") #driver.find_element(By.XPATH, "//a[@href='#']")
+    try :
+        main_menu = WebDriverWait(driver, WAIT_TIMES["10"]).until(
+            EC.presence_of_element_located((By.ID, "logging_string")))
 
-    # Create an ActionChains object
-    actions = ActionChains(driver)
+        # Create an ActionChains object
+        actions = ActionChains(driver)
 
-    # Perform mouse hover action on the main UL element
-    actions.move_to_element(main_menu).perform()
-    time.sleep(3)
+        # Perform mouse hover action on the main UL element
+        actions.move_to_element(main_menu).perform()
 
-    logout_link = driver.find_element(By.ID, "action_instance_logout")
-    logout_link.click()
-    time.sleep(3)
+        logout_link = WebDriverWait(driver, WAIT_TIMES["10"]).until(
+            EC.element_to_be_clickable((By.ID, "action_instance_logout")))
+        logout_link.click()
 
-def payment_l001_new(driver , input_date):
-    # https://unicorn.baac.or.th/ws-payment-l001/2024/04/29
-
-    # Convert input_date to a datetime object
-    input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
-
-    # Find yesterday's date
-    yesterday = input_date_obj - timedelta(days=1)
-    input_date_ymd = input_date_obj.strftime("%Y/%m/%d")
-
-# Page Zip
-    url_date_ym = "https://unicorn.baac.or.th/ws-payment-l001/" + yesterday.strftime("%Y/%m")
-    driver.get(url_date_ym)
-    time.sleep(30)
-
-    # Find the element you want to click
-    span_payment = driver.find_element(By.XPATH, f"//span[@class='text_label' and contains(text(), '{input_date_ymd}')]")
-
-    # Scroll the webpage to bring the element into view
-    driver.execute_script("arguments[0].scrollIntoView();", span_payment)
-
-    # Click on the element using JavaScript
-    driver.execute_script("arguments[0].click();", span_payment)
-
-    css_download_zip = driver.find_element(By.ID, "download_button")
-    css_download_zip.click()
-    time.sleep(5)
-
-# Page Detail
-
-    # Perform a double click on the element
-    # Perform a double click on the element using JavaScript
-    driver.execute_script("arguments[0].dispatchEvent(new MouseEvent('dblclick', { bubbles: true, cancelable: true }));", span_payment)
-    time.sleep(15)
-
-    # url_date_ymd = "https://unicorn.baac.or.th/ws-payment-l001/" + yesterday.strftime("%Y/%m/%d")
-    # driver.get(url_date_ymd)
-    # time.sleep(30)
-
-    file_ymd = yesterday.strftime("%Y%m%d")
-    css_download = driver.find_element(By.ID, "download_button_label")
-    css_id_row_dc106 = "item-" + file_ymd + "dc106l001" + file_ymd + "pdf"
-    css_row_dc106 = driver.find_element(By.ID, css_id_row_dc106)
-    css_row_dc106.click()
-    css_download.click()
-
-    time.sleep(5)
-
-    css_id_row_dc105 = "item-" + file_ymd + "dc105l001" + file_ymd + "pdf"
-    css_row_dc105 = driver.find_element(By.ID, css_id_row_dc105)
-    css_row_dc105.click()
-    css_download.click()
-
-    time.sleep(5)
-
-def statement_ghb(driver , input_date):
-    # https://unicorn.baac.or.th/ws-statement-GHB1/2024/04/29
-
-    # Convert input_date to a datetime object
-    input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
-
-    # Find yesterday's date
-    yesterday = input_date_obj - timedelta(days=1)
-
-    url_date_ym = "https://unicorn.baac.or.th/ws-statement-GHB1/" + yesterday.strftime("%Y/%m/%d")
-    driver.get(url_date_ym)
-    time.sleep(30)
-
-    css_content = driver.find_element(By.ID, "content_pane")
-    css_content.click()
-    time.sleep(3)
+    except TimeoutException as t:
+        # Handle TimeoutException
+        logging.error("BAAC : Timeout occurred while waiting for element to be clickable." , exc_info=True)
+        sys.exit(1)  # Exit the program with an error code
+    except Exception as e:
+        error_message = str(e)
+        logging.error(f"BAAC : An error occurred: {error_message}")
+        sys.exit(1)  # Exit the program with an error code
 
 
-    # Find the element you want to click
-    # span_payment = driver.find_element(By.XPATH, f"//span[@class='text_label' and contains(text(), '{today_ymd}')]")
-    # span_payment.click()
+def payment_l001_new(driver, input_date):
+    try :
+        # Convert input_date to a datetime object
+        input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
 
-    css_download = driver.find_element(By.ID, "download_button_label")
-    css_download.click()
+        # Find yesterday's date
+        yesterday = input_date_obj - timedelta(days=1)
+        input_date_ymd = input_date_obj.strftime("%Y/%m/%d")
 
-def payment_l001(driver):
+        # Page Zip
+        url_date_ym = "https://unicorn.baac.or.th/ws-payment-l001/" + yesterday.strftime("%Y/%m")
+        driver.get(url_date_ym)
 
-    current_time = time.time()
-    this_year = formatted_date = time.strftime("%Y", time.localtime(current_time))
-    this_ym = formatted_date = time.strftime("%Y%m", time.localtime(current_time))
+        # Wait for the element to be clickable and then click
+        span_payment = WebDriverWait(driver, WAIT_TIMES["30"]).until(
+            EC.presence_of_element_located((By.XPATH, f"//span[@class='text_label' and contains(text(), '{input_date_ymd}')]")))
 
-    today = datetime.now()
-    yesterday = today - timedelta(days=1)
-    this_ymd = yesterday.strftime("%Y%m%d")
+        # Scroll the webpage to bring the element into view
+        driver.execute_script("arguments[0].scrollIntoView();", span_payment)
 
-    time.sleep(5)
-    menu = driver.find_element(By.ID, "repo_chooser")  # driver.find_element(By.XPATH, "//a[@href='#']")
+        # Click on the element using JavaScript
+        driver.execute_script("arguments[0].click();", span_payment)
+        # span_payment.click()
 
-    # Create an ActionChains object
-    actions = ActionChains(driver)
+        # Wait for the download button to be clickable and then click
+        css_download_zip = WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.element_to_be_clickable((By.ID, "download_button")))
+        css_download_zip.click()
 
-    # Perform mouse hover action on the main UL element
-    actions.move_to_element(menu).perform()
-    time.sleep(5)
+        # Page Detail
+        # Perform a double click on the element using JavaScript
+        driver.execute_script(
+            "arguments[0].dispatchEvent(new MouseEvent('dblclick', { bubbles: true, cancelable: true }));", span_payment)
+        time.sleep(WAIT_TIMES["10"])
 
-    # Find the span element containing the text "payment[L001]"
-    span_payment = driver.find_element(By.XPATH, "//span[text()='payment[L001]']")
-    span_payment.click()
+        file_ymd = yesterday.strftime("%Y%m%d")
+        css_download = WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.presence_of_element_located((By.ID, "download_button_label")))
 
-    time.sleep(15)
+        css_id_row_dc106 = "item-" + file_ymd + "dc106l001" + file_ymd + "pdf"
+        css_row_dc106 = WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.element_to_be_clickable((By.ID, css_id_row_dc106)))
+        css_row_dc106.click()
+        css_download.click()
+        time.sleep(WAIT_TIMES["5"])
 
-    css_id_row_year = "item-" + this_year
-    css_row_year = driver.find_element(By.ID, css_id_row_year)
-    actions.double_click(css_row_year).perform()
+        css_id_row_dc105 = "item-" + file_ymd + "dc105l001" + file_ymd + "pdf"
+        css_row_dc105 = WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.element_to_be_clickable((By.ID, css_id_row_dc105)))
+        css_row_dc105.click()
+        css_download.click()
 
-    time.sleep(10)
+    except TimeoutException as t:
+        # Handle TimeoutException
+        logging.error("BAAC : Timeout occurred while waiting for element to be clickable." , exc_info=True)
+        sys.exit(1)  # Exit the program with an error code
+    except Exception as e:
+        error_message = str(e)
+        logging.error(f"BAAC : An error occurred: {error_message}")
+        sys.exit(1)  # Exit the program with an error code
 
-    css_id_row_ym = "item-" + this_ym
-    css_row_ym = driver.find_element(By.ID, css_id_row_ym)
-    actions.double_click(css_row_ym).perform()
+def statement_ghb(driver, input_date):
+    try :
+        # Convert input_date to a datetime object
+        input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
+        yesterday = input_date_obj - timedelta(days=1)
 
-    time.sleep(10)
+        url_date_ym = "https://unicorn.baac.or.th/ws-statement-GHB1/" + yesterday.strftime("%Y/%m/%d")
+        driver.get(url_date_ym)
+        time.sleep(WAIT_TIMES["30"])
 
-    # Find the span element with class "text_label" containing the text "2024/04/02"
-    span_payment = driver.find_element(By.XPATH, "//span[@class='text_label' and contains(text(), '2024/04/02')]")
-    span_payment.click()
-    time.sleep(3)
-    actions.double_click(span_payment).perform()
+        # Wait for the content pane to be clickable and then click
+        css_content = WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.element_to_be_clickable((By.ID, "content_pane")))
+        css_content.click()
 
-    css_id_row_ymd = "item-"+this_ymd
-    css_row_ymd = driver.find_element(By.ID, css_id_row_ymd)
-    # driver.execute_script("arguments[0].scrollIntoView();", css_row_ymd)
-    # time.sleep(3)
-    # css_row_ymd.click()
-    time.sleep(3)
-    actions.double_click(css_row_ymd).perform()
+        # Wait for the download button label to be clickable and then click
+        css_download = WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.element_to_be_clickable((By.ID, "download_button_label")))
+        css_download.click()
 
-    time.sleep(10)
-    css_download = driver.find_element(By.ID, "download_button_label")
-
-    css_id_row_dc106 = "item-" + this_ymd + "dc106l001" + this_ymd +"pdf"
-    css_row_dc106 = driver.find_element(By.ID, css_id_row_dc106)
-    css_row_dc106.click()
-    css_download.click()
-
-    time.sleep(5)
-
-    css_id_row_dc105 = "item-" + this_ymd + "dc105l001" + this_ymd + "pdf"
-    css_row_dc105 = driver.find_element(By.ID, css_id_row_dc105)
-    css_row_dc105.click()
-    css_download.click()
-
+    except TimeoutException as t:
+        # Handle TimeoutException
+        logging.error("BAAC : Timeout occurred while waiting for element to be clickable." , exc_info=True)
+        sys.exit(1)  # Exit the program with an error code
+    except Exception as e:
+        error_message = str(e)
+        logging.error(f"BAAC : An error occurred: {error_message}")
+        sys.exit(1)  # Exit the program with an error code
 
 def main():
-    username = "ghb"
-    password = "Ghb@12345"
-    input_date = "2024-05-01"
+    input_date = "2024-04-30"
 
     try:
         driver = create_web_driver()
-        login(driver, username, password)
-        time.sleep(5)
+        login(driver)
 
+        #ที่ต้องใส่ delet เพราะว่า BOT เรียก URL เร็วเกินไป
+        time.sleep(WAIT_TIMES["10"])
         payment_l001_new(driver,input_date)
         statement_ghb(driver,input_date)
-        # time.sleep(3)
-
+        time.sleep(WAIT_TIMES["5"])
         logout(driver)
 
     except Exception as e:
         print('error : ' + str(e))
         logging.error(f"An error occurred in BAAC function: {str(e)}")
-    # finally:
-    #     driver.quit()
+        sys.exit(1)  # Exit the program with an error code
+    finally:
+        driver.quit()
 
 if __name__ == "__main__":
     main()
