@@ -6,7 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
 from utils import create_web_driver,move_files
-from library.config import source_dir,destination_dir,username,password,secret_code,WAIT_TIME,WAIT_INTERVAL
+from library.config import source_dir,destination_dir,username,password,secret_code,WAIT_TIMES
 
 import time
 import logging
@@ -15,21 +15,19 @@ import sys
 # Configure logging
 logging.basicConfig(filename='error.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s')
 
-# TODO : Change from WAIT_TIME,WAIT_INTERVAL to  WAIT_TIMES
-
 def login(driver):
     try :
         driver.get("https://easypay.lotuss.com/")
 
         # Switch to the frame
-        WebDriverWait(driver, WAIT_TIME).until(EC.frame_to_be_available_and_switch_to_it("mainFrame"))
+        WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.frame_to_be_available_and_switch_to_it("mainFrame"))
 
         # Find the username, password, and secret code input fields
-        input_username = WebDriverWait(driver, WAIT_INTERVAL).until(
+        input_username = WebDriverWait(driver, WAIT_TIMES["10"]).until(
             EC.element_to_be_clickable((By.XPATH, "//input[@name='formLogin:j_id_jsp_177548282_4']")))
-        input_password = WebDriverWait(driver, WAIT_INTERVAL).until(
+        input_password = WebDriverWait(driver, WAIT_TIMES["10"]).until(
             EC.element_to_be_clickable((By.XPATH, "//input[@name='formLogin:j_id_jsp_177548282_5']")))
-        input_secret_code = WebDriverWait(driver, WAIT_INTERVAL).until(
+        input_secret_code = WebDriverWait(driver, WAIT_TIMES["10"]).until(
             EC.element_to_be_clickable((By.XPATH, "//input[@name='formLogin:j_id_jsp_177548282_6']")))
 
         # Send keys to all input fields
@@ -51,7 +49,7 @@ def login(driver):
 
 def logout(driver):
     try :
-        btn_logout = WebDriverWait(driver, WAIT_TIME).until(
+        btn_logout = WebDriverWait(driver, WAIT_TIMES["10"]).until(
             EC.element_to_be_clickable((By.XPATH, "//img[@src='images/icon_logout.png']")))
         btn_logout.click()
 
@@ -69,11 +67,11 @@ def download_zip(driver, input_date):
         input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
         input_date_dmy = input_date_obj.strftime('%d%m%y')
 
-        menu_link = WebDriverWait(driver, WAIT_TIME).until(
+        menu_link = WebDriverWait(driver, WAIT_TIMES["10"]).until(
             EC.element_to_be_clickable((By.XPATH, "//img[@src='images/icon_report.png']")))
         menu_link.click()
 
-        zip_download = WebDriverWait(driver, WAIT_TIME).until(
+        zip_download = WebDriverWait(driver, WAIT_TIMES["10"]).until(
             EC.element_to_be_clickable((By.XPATH, f"//a[text()='TES_GHB_ALL_{input_date_dmy}_{input_date_dmy}.zip']")))
         zip_download.click()
 
@@ -90,16 +88,16 @@ def download_summary(driver, input_date):
         input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
         input_date_dmy = input_date_obj.strftime('%d/%m/%Y')
 
-        home_link = WebDriverWait(driver, WAIT_TIME).until(
+        home_link = WebDriverWait(driver, WAIT_TIMES["10"]).until(
             EC.element_to_be_clickable((By.XPATH, "//img[@src='images/icon_home.png']")))
         home_link.click()
 
-        summary_link = WebDriverWait(driver, WAIT_TIME).until(
+        summary_link = WebDriverWait(driver, WAIT_TIMES["10"]).until(
             EC.element_to_be_clickable((By.XPATH, "//img[@src='images/icon_store_summary.png']")))
         summary_link.click()
 
         # Select Report in dropdownlist
-        dropdown = WebDriverWait(driver, WAIT_TIME).until(
+        dropdown = WebDriverWait(driver, WAIT_TIMES["10"]).until(
             EC.element_to_be_clickable((By.NAME, "frmBillerMonitor:j_id_jsp_108231391_10")))
 
         # Create a Select object
@@ -108,13 +106,13 @@ def download_summary(driver, input_date):
         # Select the option by its value
         select.select_by_value("RPTHO019")
 
-        start_date = WebDriverWait(driver, WAIT_TIME).until(
+        start_date = WebDriverWait(driver, WAIT_TIMES["10"]).until(
             EC.presence_of_element_located((By.ID,"frmBillerMonitor:selectStartDate")))
 
-        end_date = WebDriverWait(driver, WAIT_TIME).until(
+        end_date = WebDriverWait(driver, WAIT_TIMES["10"]).until(
             EC.presence_of_element_located((By.ID, "frmBillerMonitor:selectEndDate")))
 
-        btn_search = WebDriverWait(driver, WAIT_TIME).until(
+        btn_search = WebDriverWait(driver, WAIT_TIMES["10"]).until(
             EC.element_to_be_clickable((By.XPATH, "//img[@src='images/cmd_search_mout.gif']")))
 
         start_date.clear()
@@ -124,7 +122,7 @@ def download_summary(driver, input_date):
         btn_search.click()
 
         #ที่เอาไว้ตรงนี้เพราะต้องกด btn serach ก่อนแล้วหน้าจะ refresh แล้วค่อยค้นหา btn export
-        btn_export = WebDriverWait(driver, WAIT_TIME).until(
+        btn_export = WebDriverWait(driver, WAIT_TIMES["10"]).until(
             EC.element_to_be_clickable((By.XPATH, "//img[@src='images/icon_export.png']")))
         btn_export.click()
 

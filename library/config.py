@@ -1,10 +1,10 @@
 source_dir = {
-    #"default" : "C:/Users/GHBservice/Downloads",
-    "default" : "C:/Downloads",
+    "default" : "C:/Users/GHBservice/Downloads",
+    # "default" : "C:/Downloads",
 }
 
-pre_destination_dir = "D:/_GHB"
-# pre_destination_dir = "E:/my_work_OLD/_Git"
+# pre_destination_dir = "D:/_GHB"
+pre_destination_dir = "E:/my_work_OLD/_Git"
 
 destination_dir = {
     "counter_service": pre_destination_dir + "/Python/DI2/download/counter_service",
@@ -25,7 +25,7 @@ password = {
     "counter_service": "ghbwyq444444",
     "mpay": "G0veB@nK",
     "true": "ghbpassword",
-    "lotus" : "pASSWORD@36",
+    "lotus" : "pASSWORD@37",
     "baac" : "Ghb@12345"
 }
 

@@ -100,13 +100,13 @@ def main():
         login(driver, username, password)
         time.sleep(3)
 
-        # download_txtfile(driver)
-        # time.sleep(3)
-
-        download_xmlfile(driver)
+        download_txtfile(driver)
         time.sleep(3)
 
-        # logout(driver)
+        # download_xmlfile(driver)
+        # time.sleep(3)
+
+        logout(driver)
 
     except Exception as e:
         print('error : ' + str(e))
