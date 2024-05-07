@@ -19,6 +19,7 @@ username = {
     "mpay": "govebank",
     "true": "ghbadmin",
     "lotus" : "GHB0001",
+    "lotus-tims" : "ac70344",
     "baac" : "ghb"
 }
 
@@ -27,6 +28,7 @@ password = {
     "mpay": "G0veB@nK",
     "true": "ghbpassword",
     "lotus" : "pASSWORD@37",
+    "lotus-tims" : "Password18",
     "baac" : "Ghb@12345"
 }
 
