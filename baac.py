@@ -153,6 +153,7 @@ def main():
         statement_ghb(driver,input_date)
         time.sleep(WAIT_TIMES["5"])
         logout(driver)
+        move_files(source_dir["default"], destination_dir["counter_service"])
 
     except Exception as e:
         print('error : ' + str(e))

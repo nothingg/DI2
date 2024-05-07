@@ -11,6 +11,7 @@ destination_dir = {
     "mpay": pre_destination_dir + "/Python/DI2/download/mpay",
     "true": pre_destination_dir + "/Python/DI2/download/true",
     "lotus": pre_destination_dir + "/Python/DI2/download/lotus",
+    "baac": pre_destination_dir + "/Python/DI2/download/baac",
 }
 
 username = {
