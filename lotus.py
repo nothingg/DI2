@@ -136,7 +136,7 @@ def download_summary(driver, input_date):
         sys.exit(1)  # Exit the program with an error code
 
 def main():
-    input_date = "2024-04-30"
+    input_date = "2024-05-07"
     try:
         driver = create_web_driver()
         login(driver)
@@ -149,8 +149,8 @@ def main():
         print('error : ' + str(e))
         logging.error(f"An error occurred in Lotus function: {str(e)}")
         sys.exit(1)  # Exit the program with an error code
-    finally:
-        driver.quit()
+    # finally:
+    #     driver.quit()
 
 if __name__ == "__main__":
     main()

@@ -101,7 +101,7 @@ def download_files(driver, input_date):
         sys.exit(1)  # Exit the program with an error code
 
 def main():
-    input_date = "2024-05-01"
+    input_date = "2024-05-07"
 
     try:
         driver = create_web_driver()
@@ -115,8 +115,8 @@ def main():
         print('error : ' + str(e))
         logging.error(f"An error occurred in counter_service function: {str(e)}", exc_info=True)
         sys.exit(1)  # Exit the program with an error code
-    finally:
-        driver.quit()
+    # finally:
+    #     driver.quit()
 
 if __name__ == "__main__":
     main()

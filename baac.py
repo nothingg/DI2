@@ -141,26 +141,26 @@ def statement_ghb(driver, input_date):
         sys.exit(1)  # Exit the program with an error code
 
 def main():
-    input_date = "2024-04-30"
+    input_date = "2024-05-08"
 
     try:
         driver = create_web_driver()
         login(driver)
 
-        #ที่ต้องใส่ delet เพราะว่า BOT เรียก URL เร็วเกินไป
+        #ที่ต้องใส่ deley เพราะว่า BOT เรียก URL เร็วเกินไป
         time.sleep(WAIT_TIMES["10"])
         payment_l001_new(driver,input_date)
         statement_ghb(driver,input_date)
         time.sleep(WAIT_TIMES["5"])
         logout(driver)
-        move_files(source_dir["default"], destination_dir["counter_service"])
+        move_files(source_dir["default"], destination_dir["baac"])
 
     except Exception as e:
         print('error : ' + str(e))
         logging.error(f"An error occurred in BAAC function: {str(e)}")
         sys.exit(1)  # Exit the program with an error code
-    finally:
-        driver.quit()
+    # finally:
+    #     driver.quit()
 
 if __name__ == "__main__":
     main()

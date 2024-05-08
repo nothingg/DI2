@@ -34,3 +34,5 @@ def download_txtfile(driver):
     txt_link = driver.find_element(By.XPATH, xpath_expression)
     txt_link.click()
     time.sleep(3)
+
+    driver.find_element(By.XPATH,"//img[@src='/TIMS/JSP/logo/TH/No.gif']")

@@ -58,7 +58,10 @@ def logout(driver):
 def select_date(driver, input_date):
     try :
         input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
-        input_date_Mdy = input_date_obj.strftime('%B %d, %Y')
+        # input_date_Mdy = input_date_obj.strftime('%B %d, %Y')
+        # Parse the input date string into a datetime object
+        # Format the datetime object into the desired format
+        input_date_Mdy = input_date_obj.strftime('%B {}{}, %Y'.format('' if input_date_obj.day > 9 else ' ', input_date_obj.day))
 
         # input_calendar = WebDriverWait(driver, WAIT_TIMES["10"]).until(
         #     EC.presence_of_element_located((By.XPATH, "//*[@id='root-route']/div/div/div[3]/div/section[1]/div/span/div/input")))
@@ -119,6 +122,7 @@ def download_file(driver, input_date):
         sys.exit(1)  # Exit the program with an error code
 
 def main():
+    #TODO : IF date is 1 digit
     input_date = "2024-04-30"
 
     try:
