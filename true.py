@@ -61,13 +61,13 @@ def select_date(driver, input_date):
         # input_date_Mdy = input_date_obj.strftime('%B %d, %Y')
         # Parse the input date string into a datetime object
         # Format the datetime object into the desired format
-        input_date_Mdy = input_date_obj.strftime('%B {}{}, %Y'.format('' if input_date_obj.day > 9 else ' ', input_date_obj.day))
+        input_date_Mdy = input_date_obj.strftime('%B {}{}, %Y'.format('' if input_date_obj.day > 9 else '', input_date_obj.day))
 
         # input_calendar = WebDriverWait(driver, WAIT_TIMES["10"]).until(
         #     EC.presence_of_element_located((By.XPATH, "//*[@id='root-route']/div/div/div[3]/div/section[1]/div/span/div/input")))
         input_calendar = WebDriverWait(driver, WAIT_TIMES["10"]).until(
             EC.element_to_be_clickable((By.XPATH, "//input[@placeholder='Select date']")))
-        time.sleep(WAIT_TIMES["10"])
+        time.sleep(WAIT_TIMES["5"])
         input_calendar.click()
 
         # Check if input date is in the present month
@@ -81,6 +81,7 @@ def select_date(driver, input_date):
                 prev_month_button.click()
 
         # Locate and click on the calendar date element
+
         calendar_date = WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.element_to_be_clickable((By.XPATH, f"//td[@title='{input_date_Mdy}']")))
         calendar_date.click()
 
@@ -122,8 +123,7 @@ def download_file(driver, input_date):
         sys.exit(1)  # Exit the program with an error code
 
 def main():
-    #TODO : IF date is 1 digit
-    input_date = "2024-04-30"
+    input_date = "2024-05-07"
 
     try:
         driver = create_web_driver()
@@ -136,8 +136,8 @@ def main():
         print('error : ' + str(e))
         logging.error(f"An error occurred in TRUE function: {str(e)}")
         sys.exit(1)  # Exit the program with an error code
-    finally:
-        driver.quit()
+    # finally:
+    #     driver.quit()
 
 if __name__ == "__main__":
     main()
