@@ -6,33 +6,12 @@ btn_search = WebDriverWait(driver, WAIT_TIME).until(
 input_calendar = WebDriverWait(driver, WAIT_TIME).until(
     EC.presence_of_element_located((By.XPATH, "//*[@id='root-route']/div/div/div[3]/div/section[1]/div/span/div/input")))
 
+# Select Report in dropdownlist
+        dropdown = WebDriverWait(driver, WAIT_TIMES["10"]).until(
+            EC.element_to_be_clickable((By.NAME, "frmBillerMonitor:j_id_jsp_108231391_10")))
 
-def download_txtfile(driver):
+# Create a Select object
+select = Select(dropdown)
 
-    today = datetime.now()
-    yesterday = today - timedelta(days=1)
-    txt_dated_yesterday = yesterday.strftime("%Y%m%d")
-
-
-    main_menu = driver.find_element(By.XPATH, "//a[@href='#']")
-
-    # Create an ActionChains object
-    actions = ActionChains(driver)
-
-    # Perform mouse hover action on the main UL element
-    actions.move_to_element(main_menu).perform()
-    time.sleep(3)
-
-    txt_menu = driver.find_element(By.XPATH, "//a[@href='/AISPayStationGenWeb/text']")
-    txt_menu.click()
-    time.sleep(3)
-
-    # Download files using WebDriver
-
-    # txt_link = driver.find_element(By.XPATH, f"//a[@href='javascript:loadFile(\'AIS{txt_dated_yesterday}.log\');']")
-    xpath_expression = f"//a[contains(@href, 'AIS{txt_dated_yesterday}.log')]"
-    txt_link = driver.find_element(By.XPATH, xpath_expression)
-    txt_link.click()
-    time.sleep(3)
-
-    driver.find_element(By.XPATH,"//img[@src='/TIMS/JSP/logo/TH/No.gif']")
+# Select the option by its value
+select.select_by_value("RPTHO019")
