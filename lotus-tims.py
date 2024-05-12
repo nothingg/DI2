@@ -4,7 +4,7 @@ from selenium.webdriver.common.keys import Keys
 from datetime import datetime
 from selenium.webdriver.support.ui import WebDriverWait , Select
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 from utils import create_web_driver,move_files
 from library.config import source_dir,destination_dir,username,password,secret_code,WAIT_TIMES
@@ -41,9 +41,13 @@ def login(driver):
     # Send keys to all input fields
     input_username.send_keys(username["lotus-tims"])
     input_password.send_keys(password["lotus-tims"])
-    btn_login.click()
+    input_password.send_keys(Keys.ENTER)
+    # btn_login.click()
 
-#TODO : ต้อง hover area สักที่ก่อน ปุ่มถึงจะขึ้น
+#TODO : Logout
+def logout() :
+    pass
+
 def btn_press(driver):
 
     form_id = driver.find_element(By.ID,"Form")
@@ -96,68 +100,43 @@ def search_data(driver) :
         EC.element_to_be_clickable((By.ID, "btnSelect")))
     btn_search.click()
 
-#TODO : Can't click icon download
-def download_file(driver):
+def download_file(driver , input_date):
 
-    # Find the table
-    # table = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//table[@class='DATA']")))
-    table = driver.find_elements(By.XPATH, "//table[@class='DATA']")
+    # Parse input date string into a datetime object
+    input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
 
-    # Find the rows
-    rows = table.find_element(By.XPATH,"//tr[@class='DATAHILI']")
+    # Get the month abbreviation in lowercase
+    month_abbr_lower = input_date_obj.strftime('%b')
 
-    # Find the row with '02-May-2024'
-    for row in rows:
-        if '08-May-2024' in row.text:
-            row_index = rows.index(row)
-            break
+    # Convert the first character to uppercase and concatenate with the rest of the string
+    month_abbr_upper = month_abbr_lower[0].upper() + month_abbr_lower[1:]
 
-    # Find the image with title 'RTF'
-    image = table.find_element(By.XPATH,f".//tr[{row_index}]/td[4]/img[@title='RTF']")
-
-    # Click the image
-    image.click()
-
-    # If no matching row is found
-
-    ####################################################
-
-    # Find the row containing the date
-    row1 = driver.find_element(By.XPATH, "//tr[contains(td, '08-May-2024')]")
-
-    # Find the image with the title 'RTF' in the same row
-    rtf_image = row1.find_element(By.XPATH, ".//img[@title='RTF']")
-
-    # Click the image
-    rtf_image.click()
-
-    s1 = driver.find_element(By.XPATH, "/html/body/table/tbody/tr[2]/td[1]/form/table/tbody/tr/td/table/tbody/tr/td/div/table/tbody/tr[2]/td")
-    # save_file = driver.find_element(By.XPATH, "//tr[contains(td, 'บันทึก')]")
-
-    # save_file = driver.find_elements(By.XPATH, "//td[contains(text(), 'บันทึก')]")
-    s1.click()
-    # save_file.click()
+    # Format the datetime object into the desired output format with uppercase first character of month abbreviation
+    input_date_dMMMy = input_date_obj.strftime('%d-' + month_abbr_upper + '-%Y')
 
     # Find all rows in the table
-    # rows = driver.find_elements(By.XPATH, "//table[@class='DATA']/tbody/tr")
-    # # Iterate over each row
-    # for row in rows:
-    #     # Find the date cell in the row
-    #     date_cell = row.find_element(By.XPATH, "./td[contains(text(), '09-May-2024')]")
-    #     if date_cell:
-    #         # Find the image with the title 'RTF' in the same row
-    #         rtf_image = row.find_element(By.XPATH, "./td/img[@title='RTF']")
-    #         if rtf_image:
-    #             # Click the image
-    #             rtf_image.click()
-    #             save_file = driver.find_elements(By.XPATH, "//td[contains(text(), 'บันทึก')]")
-    #             save_file.click()
-    #
-    #             break  # Stop iterating if found
+    rows = driver.find_elements(By.XPATH, "//table[@class='DATA']/tbody/tr")
+    # Iterate over each row
+    for row in rows:
+        try :
+            # Find the date cell in the row
+            date_cell = row.find_element(By.XPATH, f"./td[contains(text(), '{input_date_dMMMy}')]")
+            if date_cell:
+                # Find the image with the title 'RTF' in the same row
+                rtf_image = row.find_element(By.XPATH, "./td/img[@title='RTF']")
+                if rtf_image:
+                    # Click the image
+                    rtf_image.click()
+                    save_file = driver.find_element(By.XPATH, "/html/body/table/tbody/tr[2]/td[1]/form/table/tbody/tr/td/table/tbody/tr/td/div/table/tbody/tr[2]/td")
+                    save_file.click()
 
+                    break  # Stop iterating if found
+        except NoSuchElementException:
+            # If the date cell is not found in the current row, continue to the next row
+            continue
 
 def main():
-    input_date = "2024-05-08"
+    input_date = "2024-05-07"
     try:
         driver = create_web_driver()
         login(driver)
@@ -167,7 +146,7 @@ def main():
         menu_document(driver)
         search_data(driver)
 
-        download_file(driver)
+        download_file(driver , input_date)
 
     except Exception as e:
         print('error : ' + str(e))
