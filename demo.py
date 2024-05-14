@@ -4,20 +4,15 @@ from selenium.webdriver.common.by import By
 import paramiko
 from utils import create_web_driver,move_files, servu_download
 
+from library.config import SERV_U_PATH
 
-# Server details
-ip_server = "test.rebex.net"
-username = "demo"
-password = "password"
-port = 22
-server_path = "/pub/example/"
-filename = "imap-console-client.png"
 
 # Local path (ensure it exists)
-local_path = "C:/Downloads/"
+# local_path = "C:/Downloads/"
 
 
-servu_download("20250501",server_path,local_path,"MEA")
+servu_download(SERV_U_PATH["counter_service"] , "INDCR000000000330000026420240513001.txt")
+
 #
 # try:
 #     # Create SSH transport

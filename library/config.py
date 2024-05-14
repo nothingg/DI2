@@ -1,6 +1,8 @@
+
+
 source_dir = {
-    "default" : "C:/Users/GHBservice/Downloads",
-    # "default" : "C:/Downloads",
+    # "default" : "C:/Users/GHBservice/Downloads",
+    "default" : "C:/Downloads"
 }
 
 # pre_destination_dir = "D:/_GHB"
@@ -36,6 +38,42 @@ password = {
 secret_code = {
     "lotus" : "3520000101"
 }
+
+############# SFTP Serv U ##############################
+env = "UAT"
+
+# Dictionary holding configuration for different environments
+SERV_U_CONFIGS = {
+    "UAT": {
+        "ip": "172.29.66.17",
+        "username": "AS400CMS",
+        "password": "GHB#123",
+        "port": "22"
+    },
+    "PROD": {
+        "ip": "172.29.66.18",
+        "username": "u_prod",
+        "password": "1234",
+        "port": "22"
+    }
+}
+
+# Get the configuration based on the environment, defaulting to UAT if not found
+SERV_U_CONFIG = SERV_U_CONFIGS.get(env.upper(), SERV_U_CONFIGS["UAT"])
+
+
+PRE_SERV_U_PATH = "/U5/DCR"
+
+SERV_U_PATH = {
+    "counter_service": PRE_SERV_U_PATH + "/CST/IN/",
+    "mpay": "govebank",
+    "true": "ghbadmin",
+    "lotus" : "GHB0001",
+    "lotus-tims" : "ac70344",
+    "baac" : "ghb"
+}
+
+############# !! SFTP Serv U ##############################
 
 WAIT_TIME = 10  # Maximum wait time in seconds
 WAIT_INTERVAL = 1  # Interval between wait checks in seconds
