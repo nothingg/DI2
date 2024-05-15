@@ -65,21 +65,26 @@ def download_files(driver, input_date):
         gco_formatted_yesterday = yesterday.strftime("%Y%m%d")
         rp_formatted_yesterday = yesterday.strftime("%d%m%y")
 
+        tomorrow = input_date_obj + timedelta(days=1)
+        tomorrow_date_md = tomorrow.strftime("%m%d")
+        gco_formatted = input_date_obj.strftime("%Y%m%d")
+        rp_formatted = input_date_obj.strftime("%d%m%y")
+
         # Download files using WebDriver
         ahref = WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.presence_of_element_located(
-            (By.XPATH, f"//a[@href='downloadclientfile.asp?file=GHB\\261{input_date_md}%2Ezip']")))
+            (By.XPATH, f"//a[@href='downloadclientfile.asp?file=GHB\\261{tomorrow_date_md}%2Ezip']")))
         ahref.click()
         time.sleep(WAIT_TIMES["5"])
 
         indcr_link = WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.presence_of_element_located((By.XPATH,
-                                                              f"//a[@href='downloadclientfile.asp?file=GHB\\INDCR0000000003300000264{gco_formatted_yesterday}001%2Etxt']")))
+                                                              f"//a[@href='downloadclientfile.asp?file=GHB\\INDCR0000000003300000264{gco_formatted}001%2Etxt']")))
         indcr_link.click()
         time.sleep(WAIT_TIMES["5"])
 
         # Try to find and download the GCO file, log a warning if not found
         try:
             gco_link = WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.element_to_be_clickable(
-                (By.XPATH, f"//a[@href='downloadclientfile.asp?file=GHB\\gco261{input_date_md}%2Ezip']")))
+                (By.XPATH, f"//a[@href='downloadclientfile.asp?file=GHB\\gco261{tomorrow_date_md}%2Ezip']")))
             gco_link.click()
             time.sleep(WAIT_TIMES["5"])
         except TimeoutException:
@@ -88,7 +93,7 @@ def download_files(driver, input_date):
             logger.warning(f"Couter Service ({input_date_obj}) : can't find gco file")
 
         report_link = WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.element_to_be_clickable(
-            (By.XPATH, f"//a[@href='downloadclientfile.asp?file=GHB\\Report%5FGHB%5F{rp_formatted_yesterday}%2Ezip']")))
+            (By.XPATH, f"//a[@href='downloadclientfile.asp?file=GHB\\Report%5FGHB%5F{rp_formatted}%2Ezip']")))
         report_link.click()
         time.sleep(WAIT_TIMES["5"])
 
@@ -101,7 +106,7 @@ def download_files(driver, input_date):
         sys.exit(1)  # Exit the program with an error code
 
 def main():
-    input_date = "2024-05-07"
+    input_date = "2024-05-14"
 
     try:
         driver = create_web_driver()
