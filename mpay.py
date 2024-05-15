@@ -57,8 +57,7 @@ def logout(driver):
 def download_xmlfile(driver, input_date):
     try :
         input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
-        yesterday = input_date_obj - timedelta(days=1)
-        txt_dated_yesterday = yesterday.strftime("%Y%m%d")
+        txt_dated = input_date_obj.strftime("%Y%m%d")
 
         main_menu = WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.element_to_be_clickable((By.XPATH, "//a[@href='#']")))
 
@@ -73,7 +72,7 @@ def download_xmlfile(driver, input_date):
         xml_menu.click()
         time.sleep(WAIT_TIMES["5"])
 
-        xml_link = WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.element_to_be_clickable((By.XPATH, f"//input[contains(@onclick, 'AIS{txt_dated_yesterday}.xml')]")))
+        xml_link = WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.element_to_be_clickable((By.XPATH, f"//input[contains(@onclick, 'AIS{txt_dated}.xml')]")))
         xml_link.click()
         time.sleep(WAIT_TIMES["5"])
 
@@ -81,7 +80,7 @@ def download_xmlfile(driver, input_date):
         # Switch to the new tab
         driver.switch_to.window(driver.window_handles[1])
 
-        pdf_link = WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.element_to_be_clickable((By.XPATH, f"//a[contains(@onclick, 'AIS{txt_dated_yesterday}.xml')]")))
+        pdf_link = WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.element_to_be_clickable((By.XPATH, f"//a[contains(@onclick, 'AIS{txt_dated}.xml')]")))
         pdf_link.click()
         time.sleep(WAIT_TIMES["5"])
 
@@ -98,8 +97,7 @@ def download_xmlfile(driver, input_date):
 def download_txtfile(driver,input_date):
     try :
         input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
-        yesterday = input_date_obj - timedelta(days=1)
-        txt_dated_yesterday = yesterday.strftime("%Y%m%d")
+        txt_dated = input_date_obj.strftime("%Y%m%d")
 
         main_menu = WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.element_to_be_clickable((By.XPATH, "//a[@href='#']")))
 
@@ -113,7 +111,7 @@ def download_txtfile(driver,input_date):
         txt_menu.click()
 
         # Download files using WebDriver
-        xpath_expression = f"//a[contains(@href, 'AIS{txt_dated_yesterday}.log')]"
+        xpath_expression = f"//a[contains(@href, 'AIS{txt_dated}.log')]"
         txt_link = WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.element_to_be_clickable((By.XPATH, xpath_expression)))
         txt_link.click()
 
@@ -126,7 +124,7 @@ def download_txtfile(driver,input_date):
         sys.exit(1)  # Exit the program with an error code
 
 def main():
-    input_date = "2024-05-07"
+    input_date = "2024-05-14"
     try:
         driver = create_web_driver()
         login(driver)
@@ -139,7 +137,7 @@ def main():
         time.sleep(WAIT_TIMES["5"])
 
         logout(driver)
-        move_files(source_dir["default"], destination_dir["mpay"])
+        move_files(source_dir["default"], destination_dir(input_date, "mpay"))
 
     except Exception as e:
         print('error : ' + str(e))
