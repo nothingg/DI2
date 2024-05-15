@@ -71,8 +71,7 @@ SERV_U_PATH = {
     "counter_service": PRE_SERV_U_PATH + "/CST/IN/",
     "mpay": PRE_SERV_U_PATH + "/AMP/IN/",
     "true": PRE_SERV_U_PATH + "/TRUE/IN/",
-    "lotus" : "GHB0001",
-    "lotus-tims" : "ac70344",
+    "lotus" : PRE_SERV_U_PATH + "/TESCO/IN/",
     "baac" : PRE_SERV_U_PATH + "/BAAC/IN/",
 }
 

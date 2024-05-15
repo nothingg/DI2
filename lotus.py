@@ -5,8 +5,8 @@ from selenium.webdriver.support.ui import WebDriverWait , Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
-from utils import create_web_driver,move_files
-from library.config import source_dir,destination_dir,username,password,secret_code,WAIT_TIMES
+from utils import create_web_driver, move_files, sftp_servu
+from library.config import source_dir, destination_dir, username, password, secret_code, WAIT_TIMES, SERV_U_PATH
 
 import time
 import logging
@@ -44,7 +44,7 @@ def login(driver):
         sys.exit(1)  # Exit the program with an error code
     except Exception as e:
         error_message = str(e)
-        logging.error(f"Lotus : An error occurred: {error_message}")
+        logging.error(f"Lotus : An error occurred: {error_message}", exc_info=True)
         sys.exit(1)  # Exit the program with an error code
 
 def logout(driver):
@@ -59,7 +59,7 @@ def logout(driver):
         sys.exit(1)  # Exit the program with an error code
     except Exception as e:
         error_message = str(e)
-        logging.error(f"Lotus : An error occurred: {error_message}")
+        logging.error(f"Lotus : An error occurred: {error_message}", exc_info=True)
         sys.exit(1)  # Exit the program with an error code
 
 def download_zip(driver, input_date):
@@ -81,7 +81,7 @@ def download_zip(driver, input_date):
         sys.exit(1)  # Exit the program with an error code
     except Exception as e:
         error_message = str(e)
-        logging.error(f"Lotus : An error occurred: {error_message}")
+        logging.error(f"Lotus : An error occurred: {error_message}", exc_info=True)
         sys.exit(1)  # Exit the program with an error code
 def download_summary(driver, input_date):
     try :
@@ -132,22 +132,37 @@ def download_summary(driver, input_date):
         sys.exit(1)  # Exit the program with an error code
     except Exception as e:
         error_message = str(e)
-        logging.error(f"Lotus : An error occurred: {error_message}")
+        logging.error(f"Lotus : An error occurred: {error_message}" , exc_info=True)
+        sys.exit(1)  # Exit the program with an error code
+
+def download_servu(input_date):
+    try :
+        input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
+        input_date_ymd = input_date_obj.strftime("%Y%m%d")
+        filename_txt = f"INDCR0000000003300000230{input_date_ymd}001.TXT"
+        filename_zip = f"REDCR0000000003300000230{input_date_ymd}001.zip"
+
+        sftp_servu(SERV_U_PATH["lotus"], filename_txt)
+        sftp_servu(SERV_U_PATH["lotus"], filename_zip)
+
+    except Exception as e:
+        logging.error(f"Lotus Service: An error occurred: {str(e)}", exc_info=True)
         sys.exit(1)  # Exit the program with an error code
 
 def main():
-    input_date = "2024-05-07"
+    input_date = "2024-05-14"
     try:
         driver = create_web_driver()
         login(driver)
         download_zip(driver, input_date)
         download_summary(driver,input_date)
         logout(driver)
-        move_files(source_dir["default"], destination_dir["lotus"])
+        download_servu(input_date)
+        move_files(source_dir["default"], destination_dir(input_date, "lotus"))
 
     except Exception as e:
         print('error : ' + str(e))
-        logging.error(f"An error occurred in Lotus function: {str(e)}")
+        logging.error(f"An error occurred in Lotus function: {str(e)}" , exc_info=True)
         sys.exit(1)  # Exit the program with an error code
     # finally:
     #     driver.quit()
