@@ -1,12 +1,12 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from datetime import datetime
+from datetime import datetime, timedelta
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
-from utils import create_web_driver,move_files
-from library.config import source_dir,destination_dir,username,password,secret_code,WAIT_TIMES
+from utils import create_web_driver, move_files, sftp_servu
+from library.config import source_dir, destination_dir, username, password, secret_code, WAIT_TIMES, SERV_U_PATH
 
 import time
 import logging
@@ -58,10 +58,13 @@ def logout(driver):
 def select_date(driver, input_date):
     try :
         input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
+        # tomorrow = input_date_obj + timedelta(days=1)
+
         # input_date_Mdy = input_date_obj.strftime('%B %d, %Y')
         # Parse the input date string into a datetime object
         # Format the datetime object into the desired format
         input_date_Mdy = input_date_obj.strftime('%B {}{}, %Y'.format('' if input_date_obj.day > 9 else '', input_date_obj.day))
+        # tomorrow_Mdy = tomorrow.strftime('%B {}{}, %Y'.format('' if tomorrow.day > 9 else '', tomorrow.day))
 
         # input_calendar = WebDriverWait(driver, WAIT_TIMES["10"]).until(
         #     EC.presence_of_element_located((By.XPATH, "//*[@id='root-route']/div/div/div[3]/div/section[1]/div/span/div/input")))
@@ -100,6 +103,7 @@ def download_file(driver, input_date):
     try :
         input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
         input_date_ymd = input_date_obj.strftime('%Y%m%d')
+
         file_names = [
             f"TRUE{input_date_ymd}01.txt",
             f"TMNGHBRPTEW_C101{input_date_ymd}.pdf",
@@ -122,19 +126,37 @@ def download_file(driver, input_date):
         logging.error(f"True: An error occurred: {str(e)}", exc_info=True)
         sys.exit(1)  # Exit the program with an error code
 
+def download_servu(input_date):
+    try :
+        input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
+        input_date_ymd = input_date_obj.strftime("%Y%m%d")
+        filename_txt = f"INDCR0000000003300000248{input_date_ymd}001.TXT"
+        filename_zip = f"REDCR0000000003300000248{input_date_ymd}001.zip"
+
+        sftp_servu(SERV_U_PATH["true"], filename_txt)
+        sftp_servu(SERV_U_PATH["true"], filename_zip)
+
+    except Exception as e:
+        logging.error(f"True Service: An error occurred: {str(e)}", exc_info=True)
+        sys.exit(1)  # Exit the program with an error code
+
 def main():
-    input_date = "2024-05-07"
+    input_date = "2024-05-14"
 
     try:
         driver = create_web_driver()
         login(driver)
         select_date(driver, input_date)
+        time.sleep(WAIT_TIMES["5"])
+
         download_file(driver,input_date)
         logout(driver)
-        move_files(source_dir["default"], destination_dir["true"])
+        download_servu(input_date)
+        move_files(source_dir["default"], destination_dir(input_date, "true"))
+
     except Exception as e:
         print('error : ' + str(e))
-        logging.error(f"An error occurred in TRUE function: {str(e)}")
+        logging.error(f"An error occurred in TRUE function: {str(e)}", exc_info=True)
         sys.exit(1)  # Exit the program with an error code
     # finally:
     #     driver.quit()

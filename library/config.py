@@ -70,7 +70,7 @@ PRE_SERV_U_PATH = "/U5/DCR"
 SERV_U_PATH = {
     "counter_service": PRE_SERV_U_PATH + "/CST/IN/",
     "mpay": PRE_SERV_U_PATH + "/AMP/IN/",
-    "true": "ghbadmin",
+    "true": PRE_SERV_U_PATH + "/TRUE/IN/",
     "lotus" : "GHB0001",
     "lotus-tims" : "ac70344",
     "baac" : PRE_SERV_U_PATH + "/BAAC/IN/",
