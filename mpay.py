@@ -6,8 +6,8 @@ from selenium.webdriver.support.ui import WebDriverWait , Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
-from utils import create_web_driver,move_files
-from library.config import source_dir,destination_dir,username,password,secret_code,WAIT_TIMES
+from utils import create_web_driver,move_files,servu_download
+from library.config import source_dir,destination_dir,username,password,secret_code,WAIT_TIMES,SERV_U_PATH
 
 import time
 import logging
@@ -94,6 +94,13 @@ def download_xmlfile(driver, input_date):
         logging.error(f"mPay Service: An error occurred: {str(e)}", exc_info=True)
         sys.exit(1)  # Exit the program with an error code
 
+def download_servu_mpay(input_date):
+
+    input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
+    input_date_ymd = input_date_obj.strftime("%Y%m%d")
+    filename = f"INDCR0000000003300000221{input_date_ymd}001.TXT"
+    servu_download(SERV_U_PATH["counter_service"],filename )
+
 def download_txtfile(driver,input_date):
     try :
         input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
@@ -137,6 +144,7 @@ def main():
         time.sleep(WAIT_TIMES["5"])
 
         logout(driver)
+        download_servu_mpay(input_date)
         move_files(source_dir["default"], destination_dir(input_date, "mpay"))
 
     except Exception as e:
