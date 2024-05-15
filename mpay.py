@@ -95,11 +95,14 @@ def download_xmlfile(driver, input_date):
         sys.exit(1)  # Exit the program with an error code
 
 def download_servu_mpay(input_date):
-
-    input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
-    input_date_ymd = input_date_obj.strftime("%Y%m%d")
-    filename = f"INDCR0000000003300000221{input_date_ymd}001.TXT"
-    sftp_servu(SERV_U_PATH["counter_service"], filename)
+    try :
+        input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
+        input_date_ymd = input_date_obj.strftime("%Y%m%d")
+        filename = f"INDCR0000000003300000221{input_date_ymd}001.TXT"
+        sftp_servu(SERV_U_PATH["mpay"], filename)
+    except Exception as e:
+        logging.error(f"mPay Service: An error occurred: {str(e)}", exc_info=True)
+        sys.exit(1)  # Exit the program with an error code
 
 def download_txtfile(driver,input_date):
     try :

@@ -6,8 +6,8 @@ from selenium.webdriver.support.ui import WebDriverWait , Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
-from utils import create_web_driver,move_files
-from library.config import source_dir,destination_dir,username,password,secret_code,WAIT_TIMES
+from utils import create_web_driver, move_files, sftp_servu
+from library.config import source_dir, destination_dir, username, password, secret_code, WAIT_TIMES, SERV_U_PATH
 
 import time
 import logging
@@ -64,16 +64,16 @@ def logout(driver):
 def payment_l001_new(driver, input_date):
     try :
         input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
-        yesterday = input_date_obj - timedelta(days=1)
-        input_date_ymd = input_date_obj.strftime("%Y/%m/%d")
+        tomorrow = input_date_obj + timedelta(days=1)
+        tomorrow_ymd = tomorrow.strftime("%Y/%m/%d")
 
         # Page Zip
-        url_date_ym = "https://unicorn.baac.or.th/ws-payment-l001/" + yesterday.strftime("%Y/%m")
+        url_date_ym = "https://unicorn.baac.or.th/ws-payment-l001/" + input_date_obj.strftime("%Y/%m")
         driver.get(url_date_ym)
 
         # Wait for the element to be clickable and then click
         span_payment = WebDriverWait(driver, WAIT_TIMES["30"]).until(
-            EC.presence_of_element_located((By.XPATH, f"//span[@class='text_label' and contains(text(), '{input_date_ymd}')]")))
+            EC.presence_of_element_located((By.XPATH, f"//span[@class='text_label' and contains(text(), '{tomorrow_ymd}')]")))
 
         # Scroll the webpage to bring the element into view
         driver.execute_script("arguments[0].scrollIntoView();", span_payment)
@@ -92,7 +92,7 @@ def payment_l001_new(driver, input_date):
             "arguments[0].dispatchEvent(new MouseEvent('dblclick', { bubbles: true, cancelable: true }));", span_payment)
         time.sleep(WAIT_TIMES["10"])
 
-        file_ymd = yesterday.strftime("%Y%m%d")
+        file_ymd = input_date_obj.strftime("%Y%m%d")
         css_download = WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.presence_of_element_located((By.ID, "download_button_label")))
 
         css_id_row_dc106 = "item-" + file_ymd + "dc106l001" + file_ymd + "pdf"
@@ -105,6 +105,7 @@ def payment_l001_new(driver, input_date):
         css_row_dc105 = WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.element_to_be_clickable((By.ID, css_id_row_dc105)))
         css_row_dc105.click()
         css_download.click()
+        time.sleep(WAIT_TIMES["5"])
 
     except TimeoutException as t:
         # Handle TimeoutException
@@ -118,9 +119,9 @@ def statement_ghb(driver, input_date):
     try :
         # Convert input_date to a datetime object
         input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
-        yesterday = input_date_obj - timedelta(days=1)
+        input_date_ymd = input_date_obj.strftime("%Y/%m/%d")
 
-        url_date_ym = "https://unicorn.baac.or.th/ws-statement-GHB1/" + yesterday.strftime("%Y/%m/%d")
+        url_date_ym = "https://unicorn.baac.or.th/ws-statement-GHB1/" + input_date_ymd
         driver.get(url_date_ym)
         time.sleep(WAIT_TIMES["30"])
 
@@ -140,8 +141,18 @@ def statement_ghb(driver, input_date):
         logging.error(f"BAAC: An error occurred: {str(e)}", exc_info=True)
         sys.exit(1)  # Exit the program with an error code
 
+def download_servu(input_date):
+    try :
+        input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
+        input_date_ymd = input_date_obj.strftime("%Y%m%d")
+        filename = f"INDCR0000000003300000205{input_date_ymd}001.TXT"
+        sftp_servu(SERV_U_PATH["baac"], filename)
+    except Exception as e:
+        logging.error(f"BAAC Service: An error occurred: {str(e)}", exc_info=True)
+        sys.exit(1)  # Exit the program with an error code
+
 def main():
-    input_date = "2024-05-08"
+    input_date = "2024-05-14"
 
     try:
         driver = create_web_driver()
@@ -149,15 +160,18 @@ def main():
 
         #ที่ต้องใส่ deley เพราะว่า BOT เรียก URL เร็วเกินไป
         time.sleep(WAIT_TIMES["10"])
+
         payment_l001_new(driver,input_date)
         statement_ghb(driver,input_date)
         time.sleep(WAIT_TIMES["5"])
+
         logout(driver)
-        move_files(source_dir["default"], destination_dir["baac"])
+        download_servu(input_date)
+        move_files(source_dir["default"], destination_dir(input_date, "baac"))
 
     except Exception as e:
         print('error : ' + str(e))
-        logging.error(f"An error occurred in BAAC function: {str(e)}")
+        logging.error(f"An error occurred in BAAC function: {str(e)}" , exc_info=True )
         sys.exit(1)  # Exit the program with an error code
     # finally:
     #     driver.quit()

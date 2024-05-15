@@ -69,11 +69,11 @@ PRE_SERV_U_PATH = "/U5/DCR"
 
 SERV_U_PATH = {
     "counter_service": PRE_SERV_U_PATH + "/CST/IN/",
-    "mpay": "govebank",
+    "mpay": PRE_SERV_U_PATH + "/AMP/IN/",
     "true": "ghbadmin",
     "lotus" : "GHB0001",
     "lotus-tims" : "ac70344",
-    "baac" : "ghb"
+    "baac" : PRE_SERV_U_PATH + "/BAAC/IN/",
 }
 
 ############# !! SFTP Serv U ##############################
