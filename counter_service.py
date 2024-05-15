@@ -6,8 +6,8 @@ from selenium.webdriver.support.ui import WebDriverWait , Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
-from utils import create_web_driver,move_files
-from library.config import source_dir,destination_dir,username,password,secret_code,WAIT_TIMES
+from utils import create_web_driver,move_files,servu_download
+from library.config import source_dir,destination_dir,username,password,secret_code,WAIT_TIMES,SERV_U_PATH
 
 import time
 import logging
@@ -105,6 +105,13 @@ def download_files(driver, input_date):
         logging.error(f"Couter Service: An error occurred: {str(e)}", exc_info=True)
         sys.exit(1)  # Exit the program with an error code
 
+def download_servu_7(input_date):
+
+    input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
+    input_date_ymd = input_date_obj.strftime("%Y%m%d")
+    filename = f"INDCR0000000003300000264{input_date_ymd}001.txt"
+    servu_download(SERV_U_PATH["counter_service"],filename )
+
 def main():
     input_date = "2024-05-14"
 
@@ -114,7 +121,9 @@ def main():
         time.sleep(WAIT_TIMES["5"])
         download_files(driver,input_date)
         logout(driver)
-        move_files(source_dir["default"], destination_dir["counter_service"])
+        download_servu_7(input_date)
+        move_files(source_dir["default"], destination_dir(input_date, "counter_service"))
+
 
     except Exception as e:
         print('error : ' + str(e))

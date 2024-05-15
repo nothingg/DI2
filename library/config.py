@@ -5,17 +5,20 @@ source_dir = {
     # "default" : "C:/Downloads"
 }
 
-# pre_destination_dir = "D:/_GHB"
-pre_destination_dir = "E:/my_work_OLD/_Git"
+def destination_dir(input_date, biller):
+    pre_destination_dir = f"E:/my_work_OLD/_Git/Python/DI2/download/{input_date}/"
 
-destination_dir = {
-    "counter_service": pre_destination_dir + "/Python/DI2/download/counter_service",
-    "mpay": pre_destination_dir + "/Python/DI2/download/mpay",
-    "true": pre_destination_dir + "/Python/DI2/download/true",
-    "lotus": pre_destination_dir + "/Python/DI2/download/lotus",
-    "lotus-tims": pre_destination_dir + "/Python/DI2/download/lotus-tims",
-    "baac": pre_destination_dir + "/Python/DI2/download/baac",
-}
+    destination_dirs = {
+        "counter_service": pre_destination_dir + "counter_service",
+        "mpay": pre_destination_dir + "mpay",
+        "true": pre_destination_dir + "true",
+        "lotus": pre_destination_dir + "lotus",
+        "lotus-tims": pre_destination_dir + "lotus-tims",
+        "baac": pre_destination_dir + "baac",
+    }
+
+    default_path = pre_destination_dir + "default"
+    return destination_dirs.get(biller, default_path)
 
 username = {
     "counter_service": "ghb",
