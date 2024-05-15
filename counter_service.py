@@ -6,7 +6,7 @@ from selenium.webdriver.support.ui import WebDriverWait , Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
-from utils import create_web_driver,move_files,servu_download
+from utils import create_web_driver,move_files,sftp_servu
 from library.config import source_dir,destination_dir,username,password,secret_code,WAIT_TIMES,SERV_U_PATH
 
 import time
@@ -106,7 +106,7 @@ def download_servu_7(input_date):
     input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
     input_date_ymd = input_date_obj.strftime("%Y%m%d")
     filename = f"INDCR0000000003300000264{input_date_ymd}001.txt"
-    servu_download(SERV_U_PATH["counter_service"],filename )
+    sftp_servu(SERV_U_PATH["counter_service"], filename)
 
 def main():
     input_date = "2024-05-14"

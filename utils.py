@@ -31,7 +31,7 @@ def move_files(source_dir, destination_dir):
         logging.error(f"An error occurred in function: move_files: {str(e)}")
 
 
-def servu_download(server_path,filename):
+def sftp_servu(server_path,filename):
 
     try:
         ip = SERV_U_CONFIG["ip"]
