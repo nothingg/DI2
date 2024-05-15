@@ -60,10 +60,6 @@ def download_files(driver, input_date):
     try :
         # Convert input_date to a datetime object
         input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
-        yesterday = input_date_obj - timedelta(days=1)
-        input_date_md = input_date_obj.strftime("%m%d")
-        gco_formatted_yesterday = yesterday.strftime("%Y%m%d")
-        rp_formatted_yesterday = yesterday.strftime("%d%m%y")
 
         tomorrow = input_date_obj + timedelta(days=1)
         tomorrow_date_md = tomorrow.strftime("%m%d")
