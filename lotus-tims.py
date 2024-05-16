@@ -44,7 +44,6 @@ def login(driver):
     input_password.send_keys(Keys.ENTER)
     # btn_login.click()
 
-#TODO : Logout
 def logout(driver) :
     try :
         driver.switch_to.default_content()
