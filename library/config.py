@@ -43,7 +43,7 @@ secret_code = {
 }
 
 ############# SFTP Serv U ##############################
-env = "UAT"
+env = "PROD"
 
 # Dictionary holding configuration for different environments
 SERV_U_CONFIGS = {
@@ -54,9 +54,9 @@ SERV_U_CONFIGS = {
         "port": "22"
     },
     "PROD": {
-        "ip": "172.29.66.18",
-        "username": "u_prod",
-        "password": "1234",
+        "ip": "172.29.81.38",
+        "username": "parut.s",
+        "password": "GHB#123",
         "port": "22"
     }
 }
@@ -65,7 +65,8 @@ SERV_U_CONFIGS = {
 SERV_U_CONFIG = SERV_U_CONFIGS.get(env.upper(), SERV_U_CONFIGS["UAT"])
 
 
-PRE_SERV_U_PATH = "/U5/DCR"
+# PRE_SERV_U_PATH = "/U5/DCR"
+PRE_SERV_U_PATH = "/DCR"
 
 SERV_U_PATH = {
     "counter_service": PRE_SERV_U_PATH + "/CST/IN/",

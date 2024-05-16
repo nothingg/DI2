@@ -106,13 +106,15 @@ def download_servu_7(input_date):
         input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
         input_date_ymd = input_date_obj.strftime("%Y%m%d")
         filename = f"INDCR0000000003300000264{input_date_ymd}001.txt"
-        sftp_servu(SERV_U_PATH["counter_service"], filename)
+        sftp_servu(SERV_U_PATH["counter_service"], filename, "counter_service")
     except Exception as e:
         logging.error(f"Couter Service: An error occurred: {str(e)}", exc_info=True)
         sys.exit(1)  # Exit the program with an error code
 
-def main():
-    input_date = "2024-05-14"
+def main(input_date = None):
+    # input_date = "2024-05-14"
+    if input_date is None:
+        input_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
 
     try:
         driver = create_web_driver()
@@ -122,7 +124,7 @@ def main():
         logout(driver)
         download_servu_7(input_date)
         move_files(source_dir["default"], destination_dir(input_date, "counter_service"))
-
+        driver.quit()
 
     except Exception as e:
         print('error : ' + str(e))

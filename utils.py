@@ -31,7 +31,7 @@ def move_files(source_dir, destination_dir):
         logging.error(f"An error occurred in function: move_files: {str(e)}")
 
 
-def sftp_servu(server_path,filename):
+def sftp_servu(server_path,filename,biller = None):
 
     try:
         ip = SERV_U_CONFIG["ip"]
@@ -53,37 +53,17 @@ def sftp_servu(server_path,filename):
         # Local file path (including filename)
         local_file = source_dir["default"] + "/" + filename
 
+        if biller == "counter_service":
+            # Check if the file already exists and rename it with a sequence number if it does
+            if os.path.exists(local_file):
+                base, ext = os.path.splitext(local_file)
+                seq = 1
+                while os.path.exists(f"{base}_{seq}{ext}"):
+                    seq += 1
+                local_file = f"{base}_{seq}{ext}"
+
         # Download the file
         sftp.get(remote_file, local_file)
-
-        #
-        # # List files in the directory
-        # files = sftp.listdir()
-        #
-        # # Filter files based on the pattern
-        # files_to_download = [file for file in files if file.startswith("INDCRxxxxxx" + input_date ) and file.endswith(".txt")]
-        #
-        # # Download each file
-        # for filename in files_to_download:
-        #     # Remote file path
-        #     remote_file = server_path + filename
-        #
-        #     # Local file path (including filename)
-        #     local_file = local_path + filename
-        #
-        #     # Download the file
-        #     sftp.get(remote_file, local_file)
-        #
-        #     print(f"File downloaded successfully: {local_file}")
-        #
-        # if(biller == "lotus"):
-        #     true_files_to_download = [file for file in files if file.startswith("REDCRxxxxxx" + input_date) and file.endswith(".zip")]
-        #     for filename_zip in true_files_to_download:
-        #         remote_file_zip = server_path + filename_zip
-        #         local_file_zip = local_path + filename_zip
-        #         sftp.get(remote_file_zip, local_file_zip)
-        #
-        #         print(f"File Zip downloaded successfully: {local_file_zip}")
 
         # Close connections
         sftp.close()

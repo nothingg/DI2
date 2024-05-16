@@ -1,7 +1,7 @@
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from datetime import datetime
+from datetime import datetime, timedelta
 from selenium.webdriver.support.ui import WebDriverWait , Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
@@ -154,14 +154,17 @@ def download_file(driver , input_date):
         # Parse input date string into a datetime object
         input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
 
+        tomorrow = input_date_obj + timedelta(days=1)
+        # tomorrow_date_md = tomorrow.strftime("%m%d")
+
         # Get the month abbreviation in lowercase
-        month_abbr_lower = input_date_obj.strftime('%b')
+        month_abbr_lower = tomorrow.strftime('%b')
 
         # Convert the first character to uppercase and concatenate with the rest of the string
         month_abbr_upper = month_abbr_lower[0].upper() + month_abbr_lower[1:]
 
         # Format the datetime object into the desired output format with uppercase first character of month abbreviation
-        input_date_dMMMy = input_date_obj.strftime('%d-' + month_abbr_upper + '-%Y')
+        tomorrow_dMMMy = tomorrow.strftime('%d-' + month_abbr_upper + '-%Y')
 
         # Find all rows in the table
         rows = driver.find_elements(By.XPATH, "//table[@class='DATA']/tbody/tr")
@@ -169,7 +172,7 @@ def download_file(driver , input_date):
         for row in rows:
             try :
                 # Find the date cell in the row
-                date_cell = row.find_element(By.XPATH, f"./td[contains(text(), '{input_date_dMMMy}')]")
+                date_cell = row.find_element(By.XPATH, f"./td[contains(text(), '{tomorrow_dMMMy}')]")
                 # date_cell = WebDriverWait(row, WAIT_TIMES["10"]).until(
                 #     EC.presence_of_element_located((By.XPATH, f"./td[contains(text(), '{input_date_dMMMy}')]"))
                 # )
@@ -202,8 +205,12 @@ def download_file(driver , input_date):
         logging.error(f"Lotus-time : An error occurred: {error_message}" , exc_info=True)
         sys.exit(1)  # Exit the program with an error code
 
-def main():
-    input_date = "2024-05-07"
+def main(input_date = None) :
+    # input_date = "2024-05-07"
+    if input_date is None:
+        input_date = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
+
+
     try:
         driver = create_web_driver()
         login(driver)
@@ -216,11 +223,11 @@ def main():
         time.sleep(WAIT_TIMES["5"])
 
         logout(driver)
-        move_files(source_dir["default"], destination_dir["lotus-tims"])
-
+        move_files(source_dir["default"], destination_dir(input_date, "lotus-tims"))
+        driver.quit()
     except Exception as e:
         print('error : ' + str(e))
-        logging.error(f"An error occurred in Lotus function: {str(e)}" , exc_info=True)
+        logging.error(f"An error occurred in Lotus-tims function: {str(e)}" , exc_info=True)
         sys.exit(1)  # Exit the program with an error code
     # finally:
     #     driver.quit()

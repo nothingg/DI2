@@ -151,8 +151,10 @@ def download_servu(input_date):
         logging.error(f"BAAC Service: An error occurred: {str(e)}", exc_info=True)
         sys.exit(1)  # Exit the program with an error code
 
-def main():
-    input_date = "2024-05-14"
+def main(input_date = None):
+    # input_date = "2024-05-14"
+    if input_date is None:
+        input_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
 
     try:
         driver = create_web_driver()
@@ -168,7 +170,7 @@ def main():
         logout(driver)
         download_servu(input_date)
         move_files(source_dir["default"], destination_dir(input_date, "baac"))
-
+        driver.quit()
     except Exception as e:
         print('error : ' + str(e))
         logging.error(f"An error occurred in BAAC function: {str(e)}" , exc_info=True )

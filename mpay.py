@@ -133,8 +133,11 @@ def download_txtfile(driver,input_date):
         logging.error(f"mPay Service: An error occurred: {str(e)}", exc_info=True)
         sys.exit(1)  # Exit the program with an error code
 
-def main():
-    input_date = "2024-05-14"
+def main(input_date = None) :
+    # input_date = "2024-05-14"
+    if input_date is None:
+        input_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+
     try:
         driver = create_web_driver()
         login(driver)
