@@ -15,6 +15,7 @@ def destination_dir(input_date, biller):
         "lotus": pre_destination_dir + "lotus",
         "lotus-tims": pre_destination_dir + "lotus-tims",
         "baac": pre_destination_dir + "baac",
+        "thaipost": pre_destination_dir + "thaipost"
     }
 
     default_path = pre_destination_dir + "default"
@@ -74,9 +75,21 @@ SERV_U_PATH = {
     "true": PRE_SERV_U_PATH + "/TRUE/IN/",
     "lotus" : PRE_SERV_U_PATH + "/TESCO/IN/",
     "baac" : PRE_SERV_U_PATH + "/BAAC/IN/",
+    "thaipost" : PRE_SERV_U_PATH + "/CAT/IN/",
 }
 
 ############# !! SFTP Serv U ##############################
+
+############# SFTP ThaiPost ##############################
+SFTP_THAIPOST_CONFIG = {
+    "ip": "ftp.payatpost.com",
+    "username": "ghbank",
+    "password": "ghbAnk",
+    "port": "21"
+}
+
+
+
 
 WAIT_TIME = 10  # Maximum wait time in seconds
 WAIT_INTERVAL = 1  # Interval between wait checks in seconds

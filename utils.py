@@ -53,7 +53,7 @@ def sftp_servu(server_path,filename,biller = None):
         # Local file path (including filename)
         local_file = source_dir["default"] + "/" + filename
 
-        if biller == "counter_service":
+        if biller == "counter_service" or biller == "thaipost" :
             # Check if the file already exists and rename it with a sequence number if it does
             if os.path.exists(local_file):
                 base, ext = os.path.splitext(local_file)
