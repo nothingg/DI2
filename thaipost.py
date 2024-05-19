@@ -27,7 +27,7 @@ def download_ftp(input_date):
         ftp_download(FTP_THAIPOST_PATH, filename_zip2)
     except Exception as e:
         logging.error(f"ThaiPost Service: An error occurred: {str(e)}", exc_info=True)
-        sys.exit(1)  # Exit the program with an error code
+        raise  # Raise the exception to be caught by the main function
 
 def download_servu(input_date):
     try :
@@ -43,7 +43,7 @@ def download_servu(input_date):
 
     except Exception as e:
         logging.error(f"ThaiPost Service: An error occurred: {str(e)}", exc_info=True)
-        sys.exit(1)  # Exit the program with an error code
+        raise  # Raise the exception to be caught by the main function
 
 def main(input_date = None):
     # input_date = "2024-05-14"
@@ -57,9 +57,9 @@ def main(input_date = None):
 
 
     except Exception as e:
-        print('error : ' + str(e))
+        # print('error : ' + str(e))
         logging.error(f"An error occurred in counter_service function: {str(e)}", exc_info=True)
-        sys.exit(1)  # Exit the program with an error code
+        raise  # Raise the exception to be caught by the main function
     # finally:
     #     driver.quit()
 

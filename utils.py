@@ -29,7 +29,7 @@ def move_files(source_dir, destination_dir):
             shutil.move(source_path, destination_path)
             print(f"Moved '{file}' to '{destination_dir}'")
     except Exception as e:
-        print('error : ' + str(e))
+        # print('error : ' + str(e))
         logging.error(f"An error occurred in function: move_files: {str(e)}")
 
 
@@ -72,8 +72,9 @@ def sftp_servu(server_path,filename,biller = None):
         transport.close()
 
     except Exception as e:
-        print('error : ' + str(e))
+        # print('error : ' + str(e))
         logging.error(f"An error occurred in function: servu_download: {str(e)}", exc_info=True)
+        raise  # Raise the exception to be caught by the calling function
 
 
 def ftp_download(server_path, filename):

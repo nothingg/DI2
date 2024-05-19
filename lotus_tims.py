@@ -64,11 +64,11 @@ def logout(driver) :
     except TimeoutException as t:
         # Handle TimeoutException
         logging.error("Lotus-tims : Timeout occurred while waiting for element to be clickable." , exc_info=True)
-        sys.exit(1)  # Exit the program with an error code
+        raise  # Raise the exception to be caught by the main function
     except Exception as e:
         error_message = str(e)
         logging.error(f"Lotus-time : An error occurred: {error_message}" , exc_info=True)
-        sys.exit(1)  # Exit the program with an error code
+        raise  # Raise the exception to be caught by the main function
 
 def btn_press(driver):
     try :
@@ -93,11 +93,11 @@ def btn_press(driver):
     except TimeoutException as t:
         # Handle TimeoutException
         logging.error("Lotus-tims : Timeout occurred while waiting for element to be clickable." , exc_info=True)
-        sys.exit(1)  # Exit the program with an error code
+        raise  # Raise the exception to be caught by the main function
     except Exception as e:
         error_message = str(e)
         logging.error(f"Lotus-time : An error occurred: {error_message}" , exc_info=True)
-        sys.exit(1)  # Exit the program with an error code
+        raise  # Raise the exception to be caught by the main function
 
 def menu_document(driver):
     try:
@@ -117,11 +117,11 @@ def menu_document(driver):
     except TimeoutException as t:
         # Handle TimeoutException
         logging.error("Lotus-tims : Timeout occurred while waiting for element to be clickable." , exc_info=True)
-        sys.exit(1)  # Exit the program with an error code
+        raise  # Raise the exception to be caught by the main function
     except Exception as e:
         error_message = str(e)
         logging.error(f"Lotus-time : An error occurred: {error_message}" , exc_info=True)
-        sys.exit(1)  # Exit the program with an error code
+        raise  # Raise the exception to be caught by the main function
 
 def search_data(driver) :
     try :
@@ -143,11 +143,11 @@ def search_data(driver) :
     except TimeoutException as t:
         # Handle TimeoutException
         logging.error("Lotus-tims : Timeout occurred while waiting for element to be clickable." , exc_info=True)
-        sys.exit(1)  # Exit the program with an error code
+        raise  # Raise the exception to be caught by the main function
     except Exception as e:
         error_message = str(e)
         logging.error(f"Lotus-time : An error occurred: {error_message}" , exc_info=True)
-        sys.exit(1)  # Exit the program with an error code
+        raise  # Raise the exception to be caught by the main function
 
 def download_file(driver , input_date):
     try :
@@ -199,11 +199,11 @@ def download_file(driver , input_date):
     except TimeoutException as t:
         # Handle TimeoutException
         logging.error("Lotus-tims : Timeout occurred while waiting for element to be clickable." , exc_info=True)
-        sys.exit(1)  # Exit the program with an error code
+        raise  # Raise the exception to be caught by the main function
     except Exception as e:
         error_message = str(e)
         logging.error(f"Lotus-time : An error occurred: {error_message}" , exc_info=True)
-        sys.exit(1)  # Exit the program with an error code
+        raise  # Raise the exception to be caught by the main function
 
 def main(input_date = None) :
     # input_date = "2024-05-07"
@@ -228,7 +228,7 @@ def main(input_date = None) :
     except Exception as e:
         print('error : ' + str(e))
         logging.error(f"An error occurred in Lotus-tims function: {str(e)}" , exc_info=True)
-        sys.exit(1)  # Exit the program with an error code
+        raise  # Raise the exception to be caught by the main function
     # finally:
     #     driver.quit()
 
