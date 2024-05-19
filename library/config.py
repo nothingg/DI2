@@ -80,15 +80,17 @@ SERV_U_PATH = {
 
 ############# !! SFTP Serv U ##############################
 
-############# SFTP ThaiPost ##############################
-SFTP_THAIPOST_CONFIG = {
+############# FTP ThaiPost ##############################
+FTP_THAIPOST_CONFIG = {
     "ip": "ftp.payatpost.com",
     "username": "ghbank",
     "password": "ghbAnk",
     "port": "21"
 }
 
+FTP_THAIPOST_PATH = "DCR/"
 
+############# !!FTP ThaiPost ##############################
 
 
 WAIT_TIME = 10  # Maximum wait time in seconds

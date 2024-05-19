@@ -3,6 +3,8 @@ import os
 import shutil
 import logging
 import paramiko
+from ftplib import FTP
+from library.config import source_dir,destination_dir,username,password,secret_code,WAIT_TIMES,SERV_U_PATH,FTP_THAIPOST_CONFIG
 
 from selenium import webdriver
 from library.config import SERV_U_CONFIG , source_dir
@@ -72,3 +74,25 @@ def sftp_servu(server_path,filename,biller = None):
     except Exception as e:
         print('error : ' + str(e))
         logging.error(f"An error occurred in function: servu_download: {str(e)}", exc_info=True)
+
+
+def ftp_download(server_path, filename):
+    ftp = FTP()
+    ftp.connect(FTP_THAIPOST_CONFIG["ip"], FTP_THAIPOST_CONFIG["port"])
+    ftp.login(user=FTP_THAIPOST_CONFIG["username"], passwd=FTP_THAIPOST_CONFIG["password"])
+
+    # Change directory to the server path
+    ftp.cwd(server_path)
+
+    # Remote file path
+    remote_file = server_path + filename
+
+    # Local file path (including filename)
+    local_file = os.path.join(source_dir["default"], filename)
+
+    # Download the file
+    with open(local_file, 'wb') as f:
+        ftp.retrbinary(f'RETR {filename}', f.write)
+
+    # Close connections
+    ftp.quit()
