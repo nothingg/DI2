@@ -88,7 +88,7 @@ FTP_THAIPOST_CONFIG = {
     "port": "21"
 }
 
-FTP_THAIPOST_PATH = "DCR/"
+FTP_THAIPOST_PATH = "/"
 
 ############# !!FTP ThaiPost ##############################
 

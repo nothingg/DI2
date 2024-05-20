@@ -79,7 +79,7 @@ def sftp_servu(server_path,filename,biller = None):
 
 def ftp_download(server_path, filename):
     ftp = FTP()
-    ftp.connect(FTP_THAIPOST_CONFIG["ip"], FTP_THAIPOST_CONFIG["port"])
+    ftp.connect(FTP_THAIPOST_CONFIG["ip"], int(FTP_THAIPOST_CONFIG["port"]))
     ftp.login(user=FTP_THAIPOST_CONFIG["username"], passwd=FTP_THAIPOST_CONFIG["password"])
 
     # Change directory to the server path
