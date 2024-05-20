@@ -8,13 +8,13 @@ import logging
 
 # Your script files mapped to their respective main functions
 scripts = {
-    'counter_service': 'counter_service',
     'baac': 'baac',
+    'counter_service': 'counter_service',
     'lotus': 'lotus',
     'lotus_tims': 'lotus_tims',
-    'mpay': 'mpay',
+    'true': 'true',
     'thaipost': 'thaipost',
-    'true': 'true'
+    'mpay': 'mpay'
 }
 
 scripts['All'] = 'all'
