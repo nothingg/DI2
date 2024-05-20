@@ -159,12 +159,10 @@ def main(input_date = None):
     try:
         driver = create_web_driver()
         login(driver)
-
         #ที่ต้องใส่ deley เพราะว่า BOT เรียก URL เร็วเกินไป
         time.sleep(WAIT_TIMES["10"])
 
         payment_l001_new(driver,input_date)
-        statement_ghb(driver,input_date)
         time.sleep(WAIT_TIMES["5"])
 
         logout(driver)

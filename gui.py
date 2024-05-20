@@ -8,8 +8,8 @@ import logging
 
 # Your script files mapped to their respective main functions
 scripts = {
-    'baac': 'baac',
     'counter_service': 'counter_service',
+    'baac': 'baac',
     'lotus': 'lotus',
     'lotus_tims': 'lotus_tims',
     'mpay': 'mpay',
@@ -31,7 +31,7 @@ class App(tk.Tk):
         self.title("Script Runner")
 
         # Dropdown menu
-        self.label_script = tk.Label(self, text="Select Script:")
+        self.label_script = tk.Label(self, text="Biller:")
         self.label_script.pack(pady=10)
 
         self.script_var = tk.StringVar()
@@ -50,6 +50,14 @@ class App(tk.Tk):
         self.run_button = tk.Button(self, text="Run Script", command=self.run_script)
         self.run_button.pack(pady=20)
 
+        # Run BAAC Stmt button
+        self.run_baac_stmt_button = tk.Button(self, text="Run BAAC Stmt", command=self.run_baac_stmt)
+        self.run_baac_stmt_button.pack(pady=10)
+
+        # Reset button
+        self.reset_button = tk.Button(self, text="Reset", command=self.reset_values)
+        self.reset_button.pack(pady=10)
+
         # Result frame
         self.result_frame = tk.Frame(self)
         self.result_frame.pack(pady=20)
@@ -58,6 +66,31 @@ class App(tk.Tk):
         self.status_var = tk.StringVar()
         self.status_label = tk.Label(self, textvariable=self.status_var)
         self.status_label.pack(pady=10)
+
+    def reset_values(self):
+        self.script_var.set('')
+        self.calendar.selection_clear()
+        self.status_var.set('')
+        for widget in self.result_frame.winfo_children():
+            widget.destroy()
+
+    def run_baac_stmt(self):
+        selected_date = self.calendar.get_date()
+
+        # Clear previous results
+        for widget in self.result_frame.winfo_children():
+            widget.destroy()
+
+        if selected_date:
+            self.status_var.set("Running...")
+            self.run_button.config(state=tk.DISABLED)
+            self.run_baac_stmt_button.config(state=tk.DISABLED)
+            self.reset_button.config(state=tk.DISABLED)
+            self.script_menu.config(state=tk.DISABLED)
+            self.calendar.config(state=tk.DISABLED)
+            threading.Thread(target=self.execute_scripts, args=('baac_stmt', selected_date)).start()
+        else:
+            messagebox.showwarning("Input Error", "Please select a date")
 
     def run_script(self):
         selected_script = self.script_var.get()
@@ -70,6 +103,8 @@ class App(tk.Tk):
         if selected_script and selected_date:
             self.status_var.set("Running...")
             self.run_button.config(state=tk.DISABLED)
+            self.run_baac_stmt_button.config(state=tk.DISABLED)
+            self.reset_button.config(state=tk.DISABLED)
             self.script_menu.config(state=tk.DISABLED)
             self.calendar.config(state=tk.DISABLED)
             threading.Thread(target=self.execute_scripts, args=(selected_script, selected_date)).start()
@@ -84,11 +119,13 @@ class App(tk.Tk):
 
         self.status_var.set("Finished")
         self.run_button.config(state=tk.NORMAL)
+        self.run_baac_stmt_button.config(state=tk.NORMAL)
+        self.reset_button.config(state=tk.NORMAL)
         self.script_menu.config(state=tk.NORMAL)
         self.calendar.config(state=tk.NORMAL)
 
     def run_single_script(self, script_name, input_date):
-        script_module_name = scripts[script_name]
+        script_module_name = scripts.get(script_name, script_name)   # Handle baac_stmt
         try:
             script_module = importlib.import_module(script_module_name)
             script_module.main(input_date=input_date)
@@ -118,7 +155,6 @@ class App(tk.Tk):
                     label.pack(anchor='w')
                 except Exception as e:
                     errors.append(f"{script_name}")
-
         if errors:
             error_messages = "\n".join(errors)
             messagebox.showerror("Error", f"Some scripts failed to run:\n{error_messages}")

@@ -38,11 +38,9 @@ def login(driver):
         # Handle TimeoutException
         logging.error("True : Timeout occurred while waiting for element to be clickable." , exc_info=True)
         raise  # Raise the exception to be caught by the main function
-        # sys.exit(1)  # Exit the program with an error code
     except Exception as e:
         logging.error(f"True: An error occurred: {str(e)}", exc_info=True)
         raise  # Raise the exception to be caught by the main function
-        # sys.exit(1)  # Exit the program with an error code
 
 def logout(driver):
     try :
@@ -53,11 +51,9 @@ def logout(driver):
         # Handle TimeoutException
         logging.error("True : Timeout occurred while waiting for element to be clickable.", exc_info=True)
         raise  # Raise the exception to be caught by the main function
-        # sys.exit(1)  # Exit the program with an error code
     except Exception as e:
         logging.error(f"True: An error occurred: {str(e)}", exc_info=True)
         raise  # Raise the exception to be caught by the main function
-        # sys.exit(1)  # Exit the program with an error code
 
 def select_date(driver, input_date):
     try :
@@ -99,11 +95,9 @@ def select_date(driver, input_date):
         # Handle TimeoutException
         logging.error("True : Timeout occurred while waiting for element to be clickable." , exc_info=True)
         raise  # Raise the exception to be caught by the main function
-        # sys.exit(1)  # Exit the program with an error code
     except Exception as e:
         logging.error(f"True: An error occurred: {str(e)}", exc_info=True)
         raise  # Raise the exception to be caught by the main function
-        # sys.exit(1)  # Exit the program with an error code
 
 def download_file(driver, input_date):
     try :
@@ -128,11 +122,9 @@ def download_file(driver, input_date):
         # Handle TimeoutException
         logging.error("True : Timeout occurred while waiting for element to be clickable." , exc_info=True)
         raise  # Raise the exception to be caught by the main function
-        # sys.exit(1)  # Exit the program with an error code
     except Exception as e:
         logging.error(f"True: An error occurred: {str(e)}", exc_info=True)
         raise  # Raise the exception to be caught by the main function
-        # sys.exit(1)  # Exit the program with an error code
 
 def download_servu(input_date):
     try :
@@ -147,7 +139,6 @@ def download_servu(input_date):
     except Exception as e:
         logging.error(f"True Service: An error occurred: {str(e)}", exc_info=True)
         raise  # Raise the exception to be caught by the main function
-        # sys.exit(1)  # Exit the program with an error code
 
 def main(input_date = None):
     # input_date = "2024-05-14"
@@ -170,7 +161,6 @@ def main(input_date = None):
         print('error : ' + str(e))
         logging.error(f"An error occurred in TRUE function: {str(e)}", exc_info=True)
         raise  # Raise the exception to be caught by the GUI
-        # sys.exit(1)  # Exit the program with an error code
     # finally:
     #     driver.quit()
 

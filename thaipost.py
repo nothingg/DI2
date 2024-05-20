@@ -13,7 +13,7 @@ import time
 import logging
 import sys
 
-#TODO : TEST
+
 def download_ftp(input_date):
     try:
         input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')

@@ -36,7 +36,7 @@ def login(driver):
     except TimeoutException as t:
         # Handle TimeoutException
         logging.error("Couter Service : Timeout occurred while waiting for element to be clickable." , exc_info=True)
-        sys.exit(1)  # Exit the program with an error code
+        raise  # Raise the exception to be caught by the main function
     except Exception as e:
         logging.error(f"Couter Service: An error occurred: {str(e)}", exc_info=True)
         raise  # Raise the exception to be caught by the main function
