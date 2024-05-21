@@ -1,17 +1,9 @@
-from selenium.webdriver import ActionChains
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from datetime import datetime, timedelta
-from selenium.webdriver.support.ui import WebDriverWait , Select
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
 
-from utils import create_web_driver,move_files,sftp_servu, ftp_download
-from library.config import source_dir,destination_dir,username,password,secret_code,WAIT_TIMES,SERV_U_PATH,FTP_THAIPOST_PATH
+from library.utils import move_files,sftp_servu, ftp_download
+from library.config import source_dir,destination_dir, SERV_U_PATH,FTP_THAIPOST_PATH
 
-import time
 import logging
-import sys
 
 
 def download_ftp(input_date):

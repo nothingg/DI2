@@ -1,12 +1,3 @@
-import time
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-import paramiko
-from utils import create_web_driver,move_files, sftp_servu
-
-from library.config import SERV_U_PATH
-
-
 def destination_dir(input_date, biller):
     pre_destination_dir = f"E:/my_work_OLD/_Git/Python/DI2/download/{input_date}/"
 

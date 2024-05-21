@@ -5,12 +5,10 @@ from selenium.webdriver.support.ui import WebDriverWait , Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
-from utils import create_web_driver, move_files, sftp_servu
+from library.utils import create_web_driver, move_files, sftp_servu
 from library.config import source_dir, destination_dir, username, password, secret_code, WAIT_TIMES, SERV_U_PATH
 
-import time
 import logging
-import sys
 
 # Configure logging
 logging.basicConfig(filename='error.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s')

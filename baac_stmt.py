@@ -1,19 +1,16 @@
-from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from datetime import datetime, timedelta
-from selenium.webdriver.support.ui import WebDriverWait , Select
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
-from utils import create_web_driver, move_files, sftp_servu
-from library.config import source_dir, destination_dir, username, password, secret_code, WAIT_TIMES, SERV_U_PATH
+from library.utils import create_web_driver, move_files
+from library.config import source_dir, destination_dir, WAIT_TIMES
 
 from baac import login,logout
 
 import time
 import logging
-import sys
 
 
 def adjust_to_friday(date_str):

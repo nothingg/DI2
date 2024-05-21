@@ -1,12 +1,20 @@
+import os
 
+# Get the username of the current user
+# user = os.getlogin()
 
 source_dir = {
     "default" : "C:/Users/GHBservice/Downloads"
+    # "default": f"C:/Users/{user}/Downloads"
     # "default" : "C:/Downloads"
 }
 
+
 def destination_dir(input_date, biller):
-    pre_destination_dir = f"E:/my_work_OLD/_Git/Python/DI2/download/{input_date}/"
+    # pre_destination_dir = f"E:/my_work_OLD/_Git/Python/DI2/download/{input_date}/"
+
+    parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+    pre_destination_dir = os.path.join(parent_dir, 'download', input_date, '')
 
     destination_dirs = {
         "counter_service": pre_destination_dir + "counter_service",

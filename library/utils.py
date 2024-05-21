@@ -10,11 +10,12 @@ from selenium import webdriver
 from library.config import SERV_U_CONFIG , source_dir
 
 # Configure logging
-logging.basicConfig(filename='error.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s')
+logging.basicConfig(filename='../error.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s')
 
 def create_web_driver():
-    # Create and return a configured WebDriver instance
+
     options = webdriver.ChromeOptions()
+
     options.add_experimental_option("detach", True)
     return webdriver.Chrome(options=options)
 
