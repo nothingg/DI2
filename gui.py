@@ -5,6 +5,8 @@ from tkcalendar import Calendar
 from datetime import datetime
 import importlib
 import logging
+import os
+import sys
 
 # Your script files mapped to their respective main functions
 scripts = {
@@ -23,6 +25,13 @@ scripts['All'] = 'all'
 logging.basicConfig(filename='error.log', level=logging.ERROR, format='%(filename)s - %(asctime)s - %(levelname)s - %(funcName)s - %(message)s')
 # Add "All" option to run all scripts
 
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 # Main GUI application class
 class App(tk.Tk):
@@ -127,6 +136,15 @@ class App(tk.Tk):
     def run_single_script(self, script_name, input_date):
         script_module_name = scripts.get(script_name, script_name)   # Handle baac_stmt
         try:
+            script_module_name = scripts[script_name]
+            script_path = resource_path(script_module_name + '.py')
+            spec = importlib.util.spec_from_file_location(script_module_name, script_path)
+            script_module = importlib.util.module_from_spec(spec)
+            sys.modules[script_module_name] = script_module
+            spec.loader.exec_module(script_module)
+            script_module.main(input_date=input_date)
+            self.status_label.config(text=f"{script_name}: Success")
+
             script_module = importlib.import_module(script_module_name)
             script_module.main(input_date=input_date)
             result = f"Success : {script_name}"
@@ -134,9 +152,9 @@ class App(tk.Tk):
             label = tk.Label(self.result_frame, text=result, bg="green")
             label.pack(anchor='w')
         except Exception as e:
-            result = f"Failed : {script_name}"
+            result = f"Failed : {script_name} "
             # Show error message in a messagebox
-            messagebox.showerror("Error", result)
+            messagebox.showerror("Error", result , exc_info=True)
 
             # Add result label for Failed
             label = tk.Label(self.result_frame, text=f"Failed : {script_name}",bg="red")
@@ -165,6 +183,8 @@ class App(tk.Tk):
 
         else:
             messagebox.showinfo("Success", f"All scripts ran successfully with date {input_date}")
+
+
 
 if __name__ == "__main__":
     app = App()
