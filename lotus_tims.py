@@ -156,13 +156,13 @@ def download_file(driver , input_date):
         # tomorrow_date_md = tomorrow.strftime("%m%d")
 
         # Get the month abbreviation in lowercase
-        month_abbr_lower = input_date_obj.strftime('%b')
+        month_abbr_lower = tomorrow.strftime('%b')
 
         # Convert the first character to uppercase and concatenate with the rest of the string
         month_abbr_upper = month_abbr_lower[0].upper() + month_abbr_lower[1:]
 
         # Format the datetime object into the desired output format with uppercase first character of month abbreviation
-        input_date_dMMMy = input_date_obj.strftime('%d-' + month_abbr_upper + '-%Y')
+        tomorrow_dMMMy = tomorrow.strftime('%d-' + month_abbr_upper + '-%Y')
 
         # Find all rows in the table
         rows = driver.find_elements(By.XPATH, "//table[@class='DATA']/tbody/tr")
@@ -170,7 +170,7 @@ def download_file(driver , input_date):
         for row in rows:
             try :
                 # Find the date cell in the row
-                date_cell = row.find_element(By.XPATH, f"./td[contains(text(), '{input_date_dMMMy}')]")
+                date_cell = row.find_element(By.XPATH, f"./td[contains(text(), '{tomorrow_dMMMy}')]")
                 # date_cell = WebDriverWait(row, WAIT_TIMES["10"]).until(
                 #     EC.presence_of_element_located((By.XPATH, f"./td[contains(text(), '{input_date_dMMMy}')]"))
                 # )
@@ -204,7 +204,7 @@ def download_file(driver , input_date):
         raise  # Raise the exception to be caught by the main function
 
 def main(input_date = None) :
-    # input_date = "2024-05-23"
+    input_date = "2024-05-23"
     if input_date is None:
         input_date = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
 
