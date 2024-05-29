@@ -204,7 +204,7 @@ def download_file(driver , input_date):
         raise  # Raise the exception to be caught by the main function
 
 def main(input_date = None) :
-    input_date = "2024-05-23"
+    # input_date = "2024-05-23"
     if input_date is None:
         input_date = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
 

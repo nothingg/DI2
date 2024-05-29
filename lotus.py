@@ -69,8 +69,11 @@ def download_zip(driver, input_date):
             EC.element_to_be_clickable((By.XPATH, "//img[@src='images/icon_report.png']")))
         menu_link.click()
 
+        # zip_download = WebDriverWait(driver, WAIT_TIMES["10"]).until(
+        #     EC.element_to_be_clickable((By.XPATH, f"//a[text()='TES_GHB_ALL_{input_date_dmy}_{input_date_dmy}.zip']")))
+        # zip_download.click()
         zip_download = WebDriverWait(driver, WAIT_TIMES["10"]).until(
-            EC.element_to_be_clickable((By.XPATH, f"//a[text()='TES_GHB_ALL_{input_date_dmy}_{input_date_dmy}.zip']")))
+            EC.element_to_be_clickable((By.XPATH, f"//a[contains(text(), '{input_date_dmy}.zip')]")))
         zip_download.click()
 
     except TimeoutException as t:
