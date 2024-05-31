@@ -59,20 +59,23 @@ def logout(driver):
         logging.error(f"BAAC: An error occurred: {str(e)}", exc_info=True)
         raise  # Raise the exception to be caught by the main function
 
-
+#todo : run 20240531 error
 def payment_l001_new(driver, input_date):
     try :
         input_date_obj = datetime.strptime(input_date, '%Y-%m-%d')
         tomorrow = input_date_obj + timedelta(days=1)
         tomorrow_ymd = tomorrow.strftime("%Y/%m/%d")
+        file_ymd = input_date_obj.strftime("%Y%m%d")
 
         # Page Zip
         url_date_ym = "https://unicorn.baac.or.th/ws-payment-l001/" + input_date_obj.strftime("%Y/%m")
         driver.get(url_date_ym)
 
         # Wait for the element to be clickable and then click
-        span_payment = WebDriverWait(driver, WAIT_TIMES["30"]).until(
-            EC.presence_of_element_located((By.XPATH, f"//span[@class='text_label' and contains(text(), '{tomorrow_ymd}')]")))
+        # span_payment = WebDriverWait(driver, WAIT_TIMES["30"]).until(
+        #     EC.presence_of_element_located((By.XPATH, f"//span[@class='text_label' and contains(text(), '{tomorrow_ymd}')]")))
+
+        span_payment = WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.presence_of_element_located((By.ID, f"item-{file_ymd}")))
 
         # Scroll the webpage to bring the element into view
         driver.execute_script("arguments[0].scrollIntoView();", span_payment)
@@ -91,7 +94,7 @@ def payment_l001_new(driver, input_date):
             "arguments[0].dispatchEvent(new MouseEvent('dblclick', { bubbles: true, cancelable: true }));", span_payment)
         time.sleep(WAIT_TIMES["10"])
 
-        file_ymd = input_date_obj.strftime("%Y%m%d")
+
         css_download = WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.presence_of_element_located((By.ID, "download_button_label")))
 
         css_id_row_dc106 = "item-" + file_ymd + "dc106l001" + file_ymd + "pdf"
