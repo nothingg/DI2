@@ -6,7 +6,7 @@ from selenium.webdriver.support.ui import WebDriverWait , Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
-from library.utils import create_web_driver,move_files
+from library.utils import create_web_driver, move_files, delete_all_files
 from library.config import source_dir,destination_dir,username,password, WAIT_TIMES
 
 import time
@@ -224,7 +224,7 @@ def main(input_date = None) :
         move_files(source_dir["default"], destination_dir(input_date, "lotus-tims"))
         driver.quit()
     except Exception as e:
-        print('error : ' + str(e))
+        delete_all_files(source_dir["default"])
         logging.error(f"An error occurred in Lotus-tims function: {str(e)}" , exc_info=True)
         raise  # Raise the exception to be caught by the main function
     # finally:

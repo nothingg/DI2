@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from library.utils import move_files,sftp_servu, ftp_download
+from library.utils import move_files, sftp_servu, ftp_download, delete_all_files
 from library.config import source_dir,destination_dir, SERV_U_PATH,FTP_THAIPOST_PATH
 
 import logging
@@ -49,7 +49,7 @@ def main(input_date = None):
 
 
     except Exception as e:
-        # print('error : ' + str(e))
+        delete_all_files(source_dir["default"])
         logging.error(f"An error occurred in counter_service function: {str(e)}", exc_info=True)
         raise  # Raise the exception to be caught by the main function
     # finally:

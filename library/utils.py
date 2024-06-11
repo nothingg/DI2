@@ -33,6 +33,15 @@ def move_files(source_dir, destination_dir):
         # print('error : ' + str(e))
         logging.error(f"An error occurred in function: move_files: {str(e)}")
 
+def delete_all_files(source_dir):
+    for filename in os.listdir(source_dir):
+        filepath = os.path.join(source_dir, filename)
+        try:
+            if os.path.isfile(filepath):
+                os.remove(filepath)  # Delete the file
+        except Exception as e:
+            logging.error(f"An error occurred in function: delete_all_files: {str(e)}", exc_info=True)
+            raise  # Raise the exception to be caught by the calling function
 
 def sftp_servu(server_path,filename,biller = None):
 
