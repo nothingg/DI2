@@ -75,7 +75,7 @@ def payment_l001_new(driver, input_date):
         # span_payment = WebDriverWait(driver, WAIT_TIMES["30"]).until(
         #     EC.presence_of_element_located((By.XPATH, f"//span[@class='text_label' and contains(text(), '{tomorrow_ymd}')]")))
 
-        span_payment = WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.presence_of_element_located((By.ID, f"item-{file_ymd}")))
+        span_payment = WebDriverWait(driver, WAIT_TIMES["30"]).until(EC.presence_of_element_located((By.ID, f"item-{file_ymd}")))
 
         # Scroll the webpage to bring the element into view
         driver.execute_script("arguments[0].scrollIntoView();", span_payment)
