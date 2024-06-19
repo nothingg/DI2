@@ -9,15 +9,25 @@ from library.config import source_dir,destination_dir,username,password,secret_c
 from selenium import webdriver
 from library.config import SERV_U_CONFIG , source_dir
 
+from selenium.webdriver.chrome.service import Service
+
 # Configure logging
 logging.basicConfig(filename='../error.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s')
 
+
 def create_web_driver():
+    # Get the directory of the current script
+    base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    # Construct the full path to the chromedriver
+    driver_path = os.path.join(base_path, "driver", "chromedriver-win64", "chromedriver.exe")
 
+    if not os.path.exists(driver_path):
+        raise FileNotFoundError(f"ChromeDriver not found at path: {driver_path}")
+
+    service = Service(driver_path)
     options = webdriver.ChromeOptions()
-
     options.add_experimental_option("detach", True)
-    return webdriver.Chrome(options=options)
+    return webdriver.Chrome(service=service, options=options)
 
 def move_files(source_dir, destination_dir):
     # Move files from source directory to destination directory
