@@ -1,0 +1,1 @@
+# mPay adapter package.

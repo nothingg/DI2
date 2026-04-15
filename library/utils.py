@@ -6,10 +6,9 @@ import paramiko
 from ftplib import FTP
 from library.config import source_dir,destination_dir,username,password,secret_code,WAIT_TIMES,SERV_U_PATH,FTP_THAIPOST_CONFIG
 
+import undetected_chromedriver as uc
 from selenium import webdriver
 from library.config import SERV_U_CONFIG , source_dir
-
-from selenium.webdriver.chrome.service import Service
 
 # Configure logging
 logging.basicConfig(filename='../error.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s')
@@ -18,16 +17,24 @@ logging.basicConfig(filename='../error.log', level=logging.ERROR, format='%(asct
 def create_web_driver():
     # Get the directory of the current script
     base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    # Construct the full path to the chromedriver
-    driver_path = os.path.join(base_path, "driver", "chromedriver-win64", "chromedriver.exe")
+    
+    # Note: We no longer manually specify the driver path.
+    # undetected-chromedriver will automatically download and patch the correct version
+    # that matches the installed Chrome browser.
 
-    if not os.path.exists(driver_path):
-        raise FileNotFoundError(f"ChromeDriver not found at path: {driver_path}")
+    options = uc.ChromeOptions()
+    options.add_argument("--start-maximized")
+    options.add_argument("--disable-popup-blocking")
 
-    service = Service(driver_path)
-    options = webdriver.ChromeOptions()
-    options.add_experimental_option("detach", True)
-    return webdriver.Chrome(service=service, options=options)
+    # Initialize undetected_chromedriver
+    # use_subprocess=True helps in avoiding some detection mechanisms
+    # Removed driver_executable_path to let uc manage the driver version automatically
+    driver = uc.Chrome(
+        options=options,
+        use_subprocess=True
+    )
+
+    return driver
 
 def move_files(source_dir, destination_dir):
     # Move files from source directory to destination directory

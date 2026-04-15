@@ -15,18 +15,18 @@ logging.basicConfig(filename='error.log', level=logging.ERROR, format='%(asctime
 
 def login(driver):
     try :
-        driver.get("https://easypay.lotuss.com/")
+        driver.get("https://easypay.lotuss.com/TescoBPBiller/logon.jsf")
 
         # Switch to the frame
-        WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.frame_to_be_available_and_switch_to_it("mainFrame"))
+        # WebDriverWait(driver, WAIT_TIMES["10"]).until(EC.frame_to_be_available_and_switch_to_it("mainFrame"))
 
         # Find the username, password, and secret code input fields
         input_username = WebDriverWait(driver, WAIT_TIMES["10"]).until(
-            EC.element_to_be_clickable((By.XPATH, "//input[@name='formLogin:j_id_jsp_177548282_4']")))
-        input_password = WebDriverWait(driver, WAIT_TIMES["10"]).until(
             EC.element_to_be_clickable((By.XPATH, "//input[@name='formLogin:j_id_jsp_177548282_5']")))
-        input_secret_code = WebDriverWait(driver, WAIT_TIMES["10"]).until(
+        input_password = WebDriverWait(driver, WAIT_TIMES["10"]).until(
             EC.element_to_be_clickable((By.XPATH, "//input[@name='formLogin:j_id_jsp_177548282_6']")))
+        input_secret_code = WebDriverWait(driver, WAIT_TIMES["10"]).until(
+            EC.element_to_be_clickable((By.XPATH, "//input[@name='formLogin:j_id_jsp_177548282_7']")))
 
         # Send keys to all input fields
         input_username.send_keys(username["lotus"])

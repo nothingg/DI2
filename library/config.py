@@ -4,7 +4,7 @@ import os
 # user = os.getlogin()
 
 source_dir = {
-    "default" : "C:/Users/GHBservice/Downloads"
+    "default" : "D:/ParPor/PAYMENT 1/Downloads"
     # "default": f"C:/Users/{user}/Downloads"
     # "default" : "C:/Downloads"
 }
@@ -33,16 +33,16 @@ username = {
     "counter_service": "ghb",
     "mpay": "govebank",
     "true": "ghbadmin",
-    "lotus" : "GHB0001",
+    "lotus" : "GHB01",
     "lotus-tims" : "ac70344",
     "baac" : "ghb"
 }
 
 password = {
-    "counter_service": "ghbwyq444444",
+    "counter_service": "ghbwyq111111",
     "mpay": "G0veB@nK",
     "true": "ghbpassword",
-    "lotus" : "pASSWORD@37",
+    "lotus" : "Lotus@123",
     "lotus-tims" : "Password18",
     "baac" : "Ghb@12345"
 }
