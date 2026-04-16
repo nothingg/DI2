@@ -33,7 +33,7 @@ class BrowserManager:
     def open_session(self, job: JobContext, log) -> BrowserSession:
         playwright = sync_playwright().start()
         try:
-            if job.browser_mode == "real_profile":
+            if job.browser_mode in {"real_profile", "manual_assisted"}:
                 return self._open_real_profile(playwright, job, log)
             return self._open_managed(playwright, job, log)
         except Exception as exc:
@@ -54,7 +54,10 @@ class BrowserManager:
     def _open_real_profile(self, playwright: Playwright, job: JobContext, log) -> BrowserSession:
         user_data_dir = job.temp_dir / "chrome-profile"
         ensure_dir(user_data_dir)
-        log("Opening real-profile browser session")
+        if job.browser_mode == "manual_assisted":
+            log("Opening manual-assisted browser session with a real Chrome profile")
+        else:
+            log("Opening real-profile browser session")
         launch_kwargs = {
             "channel": self.settings.chrome_channel,
             "headless": False,

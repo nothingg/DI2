@@ -20,3 +20,7 @@ class DownloadError(AppError):
 
 class ValidationError(AppError):
     """Raised when downloaded output does not match expectations."""
+
+
+class NoDataError(AppError):
+    """Raised when the selected run has no data available from the source."""

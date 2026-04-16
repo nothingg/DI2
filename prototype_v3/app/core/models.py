@@ -8,6 +8,7 @@ from pathlib import Path
 
 class JobStatus(str, Enum):
     SUCCESS = "success"
+    NO_DATA = "no_data"
     FAILED = "failed"
 
 

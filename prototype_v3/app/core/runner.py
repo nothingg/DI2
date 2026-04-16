@@ -4,8 +4,10 @@ import logging
 from collections.abc import Callable
 
 from app.adapters.base import BillerAdapter
+from app.adapters.lotus_tims.adapter import LotusTimsAdapter
 from app.adapters.mpay.adapter import MpayAdapter
 from app.core.config import AppSettings
+from app.core.errors import NoDataError
 from app.core.models import JobContext, JobRequest, JobResult, JobStatus, build_job_id
 from app.services.file_service import ensure_dir, list_files, move_to_output, require_files
 from app.services.log_service import JobLogger
@@ -19,6 +21,7 @@ class JobRunner:
         self.settings = settings
         self.logger = logging.getLogger(self.__class__.__name__)
         self.adapters: dict[str, BillerAdapter] = {
+            "lotus_tims": LotusTimsAdapter(settings=settings),
             "mpay": MpayAdapter(settings=settings),
         }
 
@@ -37,6 +40,7 @@ class JobRunner:
         job_logger.emit(f"Artifact dir: {context.artifact_dir}")
         job_logger.emit(f"Output dir: {context.output_dir}")
         job_logger.emit(f"Log file: {context.log_file}")
+        job_logger.emit(f"Browser mode: {context.browser_mode}")
 
         try:
             adapter.run(context, job_logger.emit)
@@ -52,6 +56,17 @@ class JobRunner:
                 output_dir=context.output_dir,
                 log_file=context.log_file,
                 files=output_files,
+            )
+        except NoDataError as exc:
+            job_logger.emit(f"No data: {exc}")
+            return JobResult(
+                status=JobStatus.NO_DATA,
+                job_id=context.job_id,
+                biller=context.biller,
+                run_date=context.run_date,
+                output_dir=context.output_dir,
+                log_file=context.log_file,
+                error=str(exc),
             )
         except Exception as exc:
             self.logger.exception("Job failed: %s", context.job_id)
@@ -77,7 +92,7 @@ class JobRunner:
             artifact_dir=job_root / "artifacts",
             output_dir=self.settings.output_root / request.biller / request.run_date.isoformat(),
             log_file=self.settings.base_dir / "logs" / f"{job_id}.log",
-            browser_mode=self.settings.browser_mode,
+            browser_mode=self.settings.resolve_browser_mode(request.biller),
         )
 
     def _get_adapter(self, biller: str) -> BillerAdapter:
