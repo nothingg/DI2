@@ -9,6 +9,7 @@ from pathlib import Path
 class JobStatus(str, Enum):
     SUCCESS = "success"
     NO_DATA = "no_data"
+    PARTIAL_DATA = "partial_data"
     FAILED = "failed"
 
 
@@ -49,5 +50,6 @@ class JobResult:
 
 
 def build_job_id(biller: str, run_date: date) -> str:
-    timestamp = datetime.now().strftime("%H%M%S")
-    return f"{biller}_{run_date.isoformat()}_{timestamp}"
+    del run_date
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+    return f"{biller}_{timestamp}"

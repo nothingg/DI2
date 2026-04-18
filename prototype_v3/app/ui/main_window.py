@@ -18,6 +18,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from app.adapters.baac_stmt import schema as baac_stmt_schema
 from app.adapters.lotus_tims import schema as lotus_tims_schema
 from app.core.config import AppSettings
 from app.core.models import JobRequest, JobResult, JobStatus
@@ -38,7 +39,7 @@ class MainWindow(QMainWindow):
         self.resize(760, 520)
 
         self.biller_combo = QComboBox()
-        self.biller_combo.addItems(["mpay", "lotus_tims"])
+        self.biller_combo.addItems(["mpay", "lotus_tims", "true", "counter_service", "baac", "baac_stmt"])
 
         self.date_edit = QDateEdit()
         self.date_edit.setCalendarPopup(True)
@@ -98,6 +99,13 @@ class MainWindow(QMainWindow):
                 f"selected run date={request.run_date.isoformat()}, "
                 f"document lookup date={lookup_date.isoformat()}"
             )
+        elif request.biller == "baac_stmt":
+            statement_date = baac_stmt_schema.adjust_to_business_date(request.run_date)
+            self._append_log(
+                "BAAC Statement business date mapping: "
+                f"selected run date={request.run_date.isoformat()}, "
+                f"statement date={statement_date.isoformat()}"
+            )
         self.status_label.setText("Running")
         self.run_button.setEnabled(False)
 
@@ -119,6 +127,15 @@ class MainWindow(QMainWindow):
             self.status_label.setText("No Data")
             self._append_log(f"Log file: {result.log_file}")
             QMessageBox.information(self, "No Data", result.error or "No data was found.")
+        elif result.status == JobStatus.PARTIAL_DATA:
+            self.status_label.setText("Partial Data")
+            self._append_log(result.error or "Only part of the expected data was found.")
+            if result.files:
+                self._append_log(f"Output: {result.output_dir}")
+                for output_file in result.files:
+                    self._append_log(f"File: {output_file.path}")
+            self._append_log(f"Log file: {result.log_file}")
+            QMessageBox.warning(self, "Partial Data", result.error or "Only part of the expected data was found.")
         else:
             self.status_label.setText("Failed")
             self._append_log(f"Job failed: {result.error}")
@@ -138,6 +155,14 @@ class MainWindow(QMainWindow):
                 "Lotus TIMS uses the selected date as the business date and searches "
                 f"for the document dated {lookup_date.isoformat()} (next day). "
                 "If no row exists for that document date, the run will return No Data."
+            )
+            return
+
+        if biller == "baac_stmt":
+            statement_date = baac_stmt_schema.adjust_to_business_date(run_date)
+            self.date_hint_label.setText(
+                "BAAC Statement uses the selected run date, but weekend dates are adjusted "
+                f"back to Friday. The current statement lookup date is {statement_date.isoformat()}."
             )
             return
 

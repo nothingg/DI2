@@ -3,11 +3,15 @@ from __future__ import annotations
 import logging
 from collections.abc import Callable
 
+from app.adapters.baac.adapter import BaacAdapter
+from app.adapters.baac_stmt.adapter import BaacStmtAdapter
 from app.adapters.base import BillerAdapter
+from app.adapters.counter_service.adapter import CounterServiceAdapter
 from app.adapters.lotus_tims.adapter import LotusTimsAdapter
 from app.adapters.mpay.adapter import MpayAdapter
+from app.adapters.true.adapter import TrueAdapter
 from app.core.config import AppSettings
-from app.core.errors import NoDataError
+from app.core.errors import AppError, NoDataError, PartialDataError
 from app.core.models import JobContext, JobRequest, JobResult, JobStatus, build_job_id
 from app.services.file_service import ensure_dir, list_files, move_to_output, require_files
 from app.services.log_service import JobLogger
@@ -21,8 +25,12 @@ class JobRunner:
         self.settings = settings
         self.logger = logging.getLogger(self.__class__.__name__)
         self.adapters: dict[str, BillerAdapter] = {
+            "baac": BaacAdapter(settings=settings),
+            "baac_stmt": BaacStmtAdapter(settings=settings),
+            "counter_service": CounterServiceAdapter(settings=settings),
             "lotus_tims": LotusTimsAdapter(settings=settings),
             "mpay": MpayAdapter(settings=settings),
+            "true": TrueAdapter(settings=settings),
         }
 
     def run(self, request: JobRequest, log: LogFn) -> JobResult:
@@ -61,6 +69,34 @@ class JobRunner:
             job_logger.emit(f"No data: {exc}")
             return JobResult(
                 status=JobStatus.NO_DATA,
+                job_id=context.job_id,
+                biller=context.biller,
+                run_date=context.run_date,
+                output_dir=context.output_dir,
+                log_file=context.log_file,
+                error=str(exc),
+            )
+        except PartialDataError as exc:
+            job_logger.emit(f"Partial data: {exc}")
+            files = list_files(context.temp_dir)
+            output_files = move_to_output(context.temp_dir, context.output_dir) if files else []
+            if output_files:
+                job_logger.emit(f"Moved {len(output_files)} file(s) to output despite partial data result")
+            return JobResult(
+                status=JobStatus.PARTIAL_DATA,
+                job_id=context.job_id,
+                biller=context.biller,
+                run_date=context.run_date,
+                output_dir=context.output_dir,
+                log_file=context.log_file,
+                files=output_files,
+                error=str(exc),
+            )
+        except AppError as exc:
+            self.logger.error("Job failed: %s - %s", context.job_id, exc)
+            job_logger.emit(f"Job failed: {exc}")
+            return JobResult(
+                status=JobStatus.FAILED,
                 job_id=context.job_id,
                 biller=context.biller,
                 run_date=context.run_date,

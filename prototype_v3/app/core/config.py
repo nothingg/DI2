@@ -48,11 +48,23 @@ class AppSettings:
     mpay_fetch_servu: bool
     lotus_tims_username: str | None
     lotus_tims_password: str | None
+    baac_username: str | None
+    baac_password: str | None
+    baac_fetch_servu: bool
+    true_username: str | None
+    true_password: str | None
+    true_fetch_servu: bool
+    counter_service_username: str | None
+    counter_service_password: str | None
+    counter_service_fetch_servu: bool
     servu_host: str | None
     servu_port: int
     servu_username: str | None
     servu_password: str | None
     mpay_servu_path: str
+    baac_servu_path: str
+    true_servu_path: str
+    counter_service_servu_path: str
 
     def resolve_browser_mode(self, biller: str) -> str:
         normalized = biller.replace("-", "_").lower()
@@ -81,9 +93,21 @@ class AppSettings:
             mpay_fetch_servu=_to_bool(os.getenv("MPAY_FETCH_SERVU"), default=False),
             lotus_tims_username=os.getenv("LOTUS_TIMS_USERNAME") or None,
             lotus_tims_password=os.getenv("LOTUS_TIMS_PASSWORD") or None,
+            baac_username=os.getenv("BAAC_USERNAME") or None,
+            baac_password=os.getenv("BAAC_PASSWORD") or None,
+            baac_fetch_servu=_to_bool(os.getenv("BAAC_FETCH_SERVU"), default=True),
+            true_username=os.getenv("TRUE_USERNAME") or None,
+            true_password=os.getenv("TRUE_PASSWORD") or None,
+            true_fetch_servu=_to_bool(os.getenv("TRUE_FETCH_SERVU"), default=True),
+            counter_service_username=os.getenv("COUNTER_SERVICE_USERNAME") or None,
+            counter_service_password=os.getenv("COUNTER_SERVICE_PASSWORD") or None,
+            counter_service_fetch_servu=_to_bool(os.getenv("COUNTER_SERVICE_FETCH_SERVU"), default=True),
             servu_host=os.getenv("SERVU_HOST") or None,
             servu_port=int(os.getenv("SERVU_PORT", "22")),
             servu_username=os.getenv("SERVU_USERNAME") or None,
             servu_password=os.getenv("SERVU_PASSWORD") or None,
             mpay_servu_path=os.getenv("MPAY_SERVU_PATH", "/DCR/AMP/IN/"),
+            baac_servu_path=os.getenv("BAAC_SERVU_PATH", "/DCR/BAAC/IN/"),
+            true_servu_path=os.getenv("TRUE_SERVU_PATH", "/DCR/TRUE/IN/"),
+            counter_service_servu_path=os.getenv("COUNTER_SERVICE_SERVU_PATH", "/DCR/CST/IN/"),
         )

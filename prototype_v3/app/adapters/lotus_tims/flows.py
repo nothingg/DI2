@@ -64,13 +64,25 @@ def login(page: Page, settings: AppSettings, log) -> None:
         password_input = appl_frame.locator(locators.PASSWORD_INPUT)
         password_input.fill(settings.lotus_tims_password)
         password_input.press("Enter")
-        appl_frame.locator(locators.POST_LOGIN_OK_BUTTON).wait_for(
-            state="visible",
-            timeout=DEFAULT_TIMEOUT_MS,
-        )
+        try:
+            appl_frame.locator(locators.POST_LOGIN_OK_BUTTON).wait_for(
+                state="visible",
+                timeout=DEFAULT_TIMEOUT_MS,
+            )
+        except Exception as exc:
+            username_input = appl_frame.locator(locators.USERNAME_INPUT)
+            password_input = appl_frame.locator(locators.PASSWORD_INPUT)
+            if username_input.is_visible() and password_input.is_visible():
+                raise LoginError(
+                    "Lotus TIMS login did not reach the post-login page. "
+                    "Please verify LOTUS_TIMS_USERNAME and LOTUS_TIMS_PASSWORD."
+                ) from exc
+            raise
         log("Login submitted")
         pause(page, settings, log, "after login")
     except Exception as exc:
+        if isinstance(exc, LoginError):
+            raise
         raise LoginError("Failed during Lotus TIMS login flow.") from exc
 
 

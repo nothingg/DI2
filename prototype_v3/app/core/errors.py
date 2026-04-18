@@ -24,3 +24,7 @@ class ValidationError(AppError):
 
 class NoDataError(AppError):
     """Raised when the selected run has no data available from the source."""
+
+
+class PartialDataError(AppError):
+    """Raised when only part of the expected data is available."""

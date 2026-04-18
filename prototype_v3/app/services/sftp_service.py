@@ -14,12 +14,18 @@ def download_file(
     remote_dir: str,
     filename: str,
     local_dir: Path,
+    rename_on_conflict: bool = False,
 ) -> Path:
     if not settings.servu_host or not settings.servu_username or not settings.servu_password:
         raise ConfigurationError("Missing SERVU_HOST, SERVU_USERNAME, or SERVU_PASSWORD.")
 
     ensure_dir(local_dir)
     local_path = local_dir / filename
+    if rename_on_conflict:
+        suffix = 1
+        while local_path.exists():
+            local_path = local_dir / f"{local_path.stem}_{suffix}{local_path.suffix}"
+            suffix += 1
     transport = None
     sftp = None
 
