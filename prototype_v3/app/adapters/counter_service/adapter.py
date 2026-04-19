@@ -19,6 +19,15 @@ class CounterServiceAdapter(BillerAdapter):
 
     def run(self, context: JobContext, log) -> None:
         session = None
+        logout_attempted = False
+
+        def attempt_logout() -> None:
+            nonlocal logout_attempted
+            if session is None or logout_attempted:
+                return
+            logout_attempted = True
+            flows.logout(session.page, self.settings, log)
+
         try:
             session = self.browser_manager.open_session(context, log)
             flows.login(session.page, self.settings, log)
@@ -29,7 +38,7 @@ class CounterServiceAdapter(BillerAdapter):
                 context.temp_dir,
                 log,
             )
-            flows.logout(session.page, self.settings, log)
+            attempt_logout()
 
             if self.settings.counter_service_fetch_servu:
                 filename = schema.build_indcr_filename(context.run_date)
@@ -59,8 +68,7 @@ class CounterServiceAdapter(BillerAdapter):
             )
             log("Counter Service workflow completed")
         except (NoDataError, PartialDataError):
-            if session is not None:
-                flows.logout(session.page, self.settings, log)
+            attempt_logout()
             raise
         except Exception:
             save_failure_artifacts(
@@ -72,6 +80,7 @@ class CounterServiceAdapter(BillerAdapter):
                 log_file=context.log_file,
                 log=log,
             )
+            attempt_logout()
             raise
         finally:
             if session is not None:

@@ -7,6 +7,7 @@ from app.adapters.baac.adapter import BaacAdapter
 from app.adapters.baac_stmt.adapter import BaacStmtAdapter
 from app.adapters.base import BillerAdapter
 from app.adapters.counter_service.adapter import CounterServiceAdapter
+from app.adapters.lotus.adapter import LotusAdapter
 from app.adapters.lotus_tims.adapter import LotusTimsAdapter
 from app.adapters.mpay.adapter import MpayAdapter
 from app.adapters.true.adapter import TrueAdapter
@@ -28,6 +29,7 @@ class JobRunner:
             "baac": BaacAdapter(settings=settings),
             "baac_stmt": BaacStmtAdapter(settings=settings),
             "counter_service": CounterServiceAdapter(settings=settings),
+            "lotus": LotusAdapter(settings=settings),
             "lotus_tims": LotusTimsAdapter(settings=settings),
             "mpay": MpayAdapter(settings=settings),
             "true": TrueAdapter(settings=settings),

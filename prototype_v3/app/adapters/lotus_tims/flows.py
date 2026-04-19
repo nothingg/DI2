@@ -63,13 +63,18 @@ def login(page: Page, settings: AppSettings, log) -> None:
         appl_frame.locator(locators.USERNAME_INPUT).fill(settings.lotus_tims_username)
         password_input = appl_frame.locator(locators.PASSWORD_INPUT)
         password_input.fill(settings.lotus_tims_password)
-        password_input.press("Enter")
+        appl_frame.locator(locators.LOGIN_BUTTON).click()
         try:
             appl_frame.locator(locators.POST_LOGIN_OK_BUTTON).wait_for(
                 state="visible",
                 timeout=DEFAULT_TIMEOUT_MS,
             )
         except Exception as exc:
+            error_locator = appl_frame.locator(locators.LOGIN_ERROR_MESSAGE)
+            if error_locator.count() > 0 and error_locator.first.is_visible():
+                raise LoginError(
+                    "Lotus TIMS rejected the username or password."
+                ) from exc
             username_input = appl_frame.locator(locators.USERNAME_INPUT)
             password_input = appl_frame.locator(locators.PASSWORD_INPUT)
             if username_input.is_visible() and password_input.is_visible():

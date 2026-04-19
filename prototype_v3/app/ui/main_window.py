@@ -39,7 +39,7 @@ class MainWindow(QMainWindow):
         self.resize(760, 520)
 
         self.biller_combo = QComboBox()
-        self.biller_combo.addItems(["mpay", "lotus_tims", "true", "counter_service", "baac", "baac_stmt"])
+        self.biller_combo.addItems(["mpay", "lotus", "lotus_tims", "true", "counter_service", "baac", "baac_stmt"])
 
         self.date_edit = QDateEdit()
         self.date_edit.setCalendarPopup(True)
@@ -155,6 +155,13 @@ class MainWindow(QMainWindow):
                 "Lotus TIMS uses the selected date as the business date and searches "
                 f"for the document dated {lookup_date.isoformat()} (next day). "
                 "If no row exists for that document date, the run will return No Data."
+            )
+            return
+
+        if biller == "lotus":
+            self.date_hint_label.setText(
+                "Lotus uses the selected date directly. Because the web portal may present "
+                "Cloudflare or other anti-bot checks, manual-assisted mode is recommended for this biller."
             )
             return
 

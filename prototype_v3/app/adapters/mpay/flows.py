@@ -31,6 +31,10 @@ LOGIN_ERROR_MARKERS = (
     "not match",
     "not valid",
 )
+LOGIN_AUTHORIZATION_MARKERS = (
+    "authorization",
+    "ไม่มี authorization",
+)
 
 
 def pause(page: Page, settings: AppSettings, log, reason: str) -> None:
@@ -204,6 +208,20 @@ def login(page: Page, settings: AppSettings, log, artifact_dir: Path | None = No
                     body_text = (page.locator("body").inner_text() or "").lower()
                 except Exception:
                     body_text = ""
+
+                if any(marker in body_text for marker in LOGIN_AUTHORIZATION_MARKERS):
+                    if artifact_dir is not None:
+                        _save_login_transition_artifacts(
+                            artifact_dir,
+                            transition_screenshot,
+                            transition_html,
+                            transition_url,
+                            log,
+                        )
+                    raise LoginError(
+                        "mPay showed a transient authorization error page after submit and then returned to login. "
+                        "Please verify MPAY_USERNAME and MPAY_PASSWORD."
+                    )
 
                 if any(marker in body_text for marker in LOGIN_ERROR_MARKERS):
                     if artifact_dir is not None:

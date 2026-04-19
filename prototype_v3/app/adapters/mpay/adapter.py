@@ -20,6 +20,15 @@ class MpayAdapter(BillerAdapter):
     def run(self, context: JobContext, log) -> None:
         session = None
         viewer_page = None
+        logout_attempted = False
+
+        def attempt_logout() -> None:
+            nonlocal logout_attempted
+            if session is None or logout_attempted:
+                return
+            logout_attempted = True
+            flows.logout(session.page, self.settings, log)
+
         try:
             session = self.browser_manager.open_session(context, log)
             flows.login(session.page, self.settings, log, context.artifact_dir)
@@ -55,7 +64,7 @@ class MpayAdapter(BillerAdapter):
                 )
                 session.page.bring_to_front()
 
-            flows.logout(session.page, self.settings, log)
+            attempt_logout()
 
             if missing_items and not available_items:
                 raise NoDataError(
@@ -91,12 +100,10 @@ class MpayAdapter(BillerAdapter):
 
             log("mPay workflow completed")
         except NoDataError:
-            if session is not None:
-                flows.logout(session.page, self.settings, log)
+            attempt_logout()
             raise
         except PartialDataError:
-            if session is not None:
-                flows.logout(session.page, self.settings, log)
+            attempt_logout()
             raise
         except Exception:
             save_failure_artifacts(
@@ -108,6 +115,7 @@ class MpayAdapter(BillerAdapter):
                 log_file=context.log_file,
                 log=log,
             )
+            attempt_logout()
             raise
         finally:
             if session is not None:

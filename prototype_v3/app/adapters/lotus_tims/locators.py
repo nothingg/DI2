@@ -6,6 +6,7 @@ MENU_FRAME = "MENU"
 USERNAME_INPUT = "input[name='LOGUSER']"
 PASSWORD_INPUT = "input[name='LOGPASS']"
 LOGIN_BUTTON = "input[name='A_L']"
+LOGIN_ERROR_MESSAGE = "xpath=//*[contains(normalize-space(.), 'ใส่ชื่อหรือรหัสผ่านไม่ถูกต้อง')]"
 
 POST_LOGIN_FORM = "#Form"
 HOME_LINK = "a[href='/TIMS/xihome']"

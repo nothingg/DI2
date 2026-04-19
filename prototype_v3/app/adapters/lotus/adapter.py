@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from app.adapters.base import BillerAdapter
-from app.adapters.true import flows, schema
+from app.adapters.lotus import flows, schema
 from app.browser.manager import BrowserManager
 from app.core.config import AppSettings
 from app.core.errors import NoDataError, PartialDataError
@@ -10,8 +10,8 @@ from app.services.artifact_service import save_failure_artifacts
 from app.services.sftp_service import download_file as download_sftp_file
 
 
-class TrueAdapter(BillerAdapter):
-    biller_name = "true"
+class LotusAdapter(BillerAdapter):
+    biller_name = "lotus"
 
     def __init__(self, settings: AppSettings) -> None:
         self.settings = settings
@@ -31,28 +31,44 @@ class TrueAdapter(BillerAdapter):
         try:
             session = self.browser_manager.open_session(context, log)
             flows.login(session.page, self.settings, log)
-            flows.select_run_date(session.page, self.settings, context.run_date, log)
-            flows.download_web_reports(session.page, self.settings, context.run_date, context.temp_dir, log)
+            download_result = flows.download_web_reports(
+                session.page,
+                self.settings,
+                context.run_date,
+                context.temp_dir,
+                log,
+            )
             attempt_logout()
 
-            if self.settings.true_fetch_servu:
+            if self.settings.lotus_fetch_servu:
                 for filename in schema.build_servu_filenames(context.run_date):
-                    log(f"Downloading True SFTP file: {filename}")
+                    log(f"Downloading Lotus SFTP file: {filename}")
                     download_sftp_file(
                         settings=self.settings,
-                        remote_dir=self.settings.true_servu_path,
+                        remote_dir=self.settings.lotus_servu_path,
                         filename=filename,
                         local_dir=context.temp_dir,
                     )
             else:
-                log("Skipping True SFTP download because TRUE_FETCH_SERVU is disabled")
+                log("Skipping Lotus SFTP download because LOTUS_FETCH_SERVU is disabled")
+
+            if download_result.availability.required_missing:
+                raise PartialDataError(
+                    flows.build_partial_data_message(
+                        context.run_date,
+                        download_result.availability.required_available,
+                        download_result.availability.required_missing,
+                        [],
+                    )
+                )
 
             flows.validate_downloads(
                 context.temp_dir,
-                context.run_date,
-                include_servu=self.settings.true_fetch_servu,
+                [path.name for path in download_result.downloaded_files],
+                include_servu=self.settings.lotus_fetch_servu,
+                run_date=context.run_date,
             )
-            log("True workflow completed")
+            log("Lotus workflow completed")
         except (NoDataError, PartialDataError):
             attempt_logout()
             raise

@@ -42,7 +42,7 @@ password = {
     "counter_service": "ghbwyq111111",
     "mpay": "G0veB@nK",
     "true": "ghbpassword",
-    "lotus" : "Lotus@123",
+    "lotus" : "Lotus@12345",
     "lotus-tims" : "Password18",
     "baac" : "Ghb@12345"
 }

@@ -6,7 +6,7 @@ from pathlib import Path
 from playwright.sync_api import Page, TimeoutError as PlaywrightTimeoutError
 
 from app.actions.forms import click, fill_text
-from app.actions.waits import wait_for_network_idle, wait_for_page_ready, wait_for_visible
+from app.actions.waits import wait_for_any_visible, wait_for_network_idle, wait_for_page_ready, wait_for_visible
 from app.adapters.true import locators, schema
 from app.browser.downloads import ensure_download_exists, save_download
 from app.core.config import AppSettings
@@ -39,23 +39,32 @@ def login(page: Page, settings: AppSettings, log) -> None:
         fill_text(page, locators.USERNAME_INPUT, settings.true_username)
         password_input = page.locator(locators.PASSWORD_INPUT)
         password_input.fill(settings.true_password)
-        password_input.press("Enter")
+        click(page, locators.LOGIN_BUTTON)
         try:
-            wait_for_visible(page, locators.POST_LOGIN_READY, timeout_ms=DEFAULT_TIMEOUT_MS)
+            visible_selector = wait_for_any_visible(
+                page,
+                [
+                    locators.POST_LOGIN_READY,
+                    locators.LOGIN_ERROR_MESSAGE,
+                    locators.USERNAME_INPUT,
+                ],
+                timeout_ms=DEFAULT_TIMEOUT_MS,
+            )
         except Exception as exc:
-            username_input = page.locator(locators.USERNAME_INPUT)
+            raise
+        if visible_selector == locators.LOGIN_ERROR_MESSAGE:
+            message = page.locator(locators.LOGIN_ERROR_MESSAGE).first.inner_text().strip()
+            raise LoginError(
+                "True rejected the username or password"
+                f"{': ' + message if message else '.'}"
+            )
+        if visible_selector == locators.USERNAME_INPUT:
             password_input = page.locator(locators.PASSWORD_INPUT)
-            if (
-                username_input.count() > 0
-                and password_input.count() > 0
-                and username_input.first.is_visible()
-                and password_input.first.is_visible()
-            ):
+            if password_input.count() > 0 and password_input.first.is_visible():
                 raise LoginError(
                     "True login did not reach the post-login page. "
                     "Please verify TRUE_USERNAME and TRUE_PASSWORD."
-                ) from exc
-            raise
+                )
         log("Login submitted")
         pause(page, settings, log, "after login")
     except Exception as exc:

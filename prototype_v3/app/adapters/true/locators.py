@@ -2,6 +2,8 @@ LOGIN_URL = "https://pago.truecorp.co.th/tmnos-wdl/ghb"
 
 USERNAME_INPUT = "input[type='text'][placeholder='Username'][autocomplete='off']"
 PASSWORD_INPUT = "input[type='password'][placeholder='Password'][autocomplete='off']"
+LOGIN_BUTTON = "button"
+LOGIN_ERROR_MESSAGE = ".error-message"
 POST_LOGIN_READY = ".button-logout"
 
 DATE_INPUT = "input[placeholder='Select date']"

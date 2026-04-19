@@ -18,7 +18,16 @@ class LotusTimsAdapter(BillerAdapter):
 
     def run(self, context: JobContext, log) -> None:
         session = None
+        logout_attempted = False
         lookup_date = schema.build_lookup_date(context.run_date)
+
+        def attempt_logout() -> None:
+            nonlocal logout_attempted
+            if session is None or logout_attempted:
+                return
+            logout_attempted = True
+            flows.logout(session.page, self.settings, log)
+
         try:
             log(
                 "Lotus TIMS business date mapping: "
@@ -37,11 +46,10 @@ class LotusTimsAdapter(BillerAdapter):
                 context.temp_dir,
                 log,
             )
-            flows.logout(session.page, self.settings, log)
+            attempt_logout()
             log(f"Lotus TIMS workflow completed: {download_path.name}")
         except NoDataError:
-            if session is not None:
-                flows.logout(session.page, self.settings, log)
+            attempt_logout()
             raise
         except Exception:
             save_failure_artifacts(
@@ -53,6 +61,7 @@ class LotusTimsAdapter(BillerAdapter):
                 log_file=context.log_file,
                 log=log,
             )
+            attempt_logout()
             raise
         finally:
             if session is not None:
