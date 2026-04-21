@@ -17,6 +17,7 @@ class JobStatus(str, Enum):
 class JobRequest:
     biller: str
     run_date: date
+    lotus_manual_login: bool | None = None
 
 
 @dataclass(slots=True)

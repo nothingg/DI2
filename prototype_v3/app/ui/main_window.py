@@ -5,6 +5,7 @@ import logging
 from PySide6.QtCore import QDate
 from PySide6.QtWidgets import (
     QApplication,
+    QCheckBox,
     QComboBox,
     QDateEdit,
     QFormLayout,
@@ -50,6 +51,10 @@ class MainWindow(QMainWindow):
         self.date_hint_label = QLabel()
         self.date_hint_label.setWordWrap(True)
 
+        self.lotus_manual_login_checkbox = QCheckBox("user manaul")
+        self.lotus_manual_login_checkbox.setChecked(settings.lotus_manual_login)
+        self.lotus_login_label = QLabel("Lotus Login")
+
         self.run_button = QPushButton("Run")
         self.run_button.clicked.connect(self._start_job)
 
@@ -60,6 +65,7 @@ class MainWindow(QMainWindow):
         form = QFormLayout()
         form.addRow("Biller", self.biller_combo)
         form.addRow("Run Date", self.date_edit)
+        form.addRow(self.lotus_login_label, self.lotus_manual_login_checkbox)
         form.addRow("", self.date_hint_label)
 
         button_row = QHBoxLayout()
@@ -87,6 +93,11 @@ class MainWindow(QMainWindow):
         request = JobRequest(
             biller=self.biller_combo.currentText(),
             run_date=self.date_edit.date().toPython(),
+            lotus_manual_login=(
+                self.lotus_manual_login_checkbox.isChecked()
+                if self.biller_combo.currentText() == "lotus"
+                else None
+            ),
         )
         self.log_output.clear()
         self._append_log(
@@ -106,6 +117,9 @@ class MainWindow(QMainWindow):
                 f"selected run date={request.run_date.isoformat()}, "
                 f"statement date={statement_date.isoformat()}"
             )
+        elif request.biller == "lotus":
+            login_mode = "manual" if request.lotus_manual_login else "automatic"
+            self._append_log(f"Lotus login mode: {login_mode}")
         self.status_label.setText("Running")
         self.run_button.setEnabled(False)
 
@@ -148,6 +162,8 @@ class MainWindow(QMainWindow):
     def _refresh_date_hint(self) -> None:
         biller = self.biller_combo.currentText()
         run_date = self.date_edit.date().toPython()
+        self.lotus_login_label.setVisible(biller == "lotus")
+        self.lotus_manual_login_checkbox.setVisible(biller == "lotus")
 
         if biller == "lotus_tims":
             lookup_date = lotus_tims_schema.build_lookup_date(run_date)
@@ -161,7 +177,7 @@ class MainWindow(QMainWindow):
         if biller == "lotus":
             self.date_hint_label.setText(
                 "Lotus uses the selected date directly. Because the web portal may present "
-                "Cloudflare or other anti-bot checks, manual-assisted mode is recommended for this biller."
+                "Cloudflare or other anti-bot checks, use manual login if the automatic login is blocked."
             )
             return
 

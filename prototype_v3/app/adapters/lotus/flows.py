@@ -85,6 +85,19 @@ def _is_execution_context_reset(exc: Exception) -> bool:
     return "Execution context was destroyed" in str(exc)
 
 
+def _is_target_closed(exc: Exception) -> bool:
+    return "Target page, context or browser has been closed" in str(exc)
+
+
+def _wait_for_security_poll(page: Page) -> None:
+    try:
+        page.wait_for_timeout(SECURITY_POLL_MS)
+    except PlaywrightError as exc:
+        if _is_target_closed(exc):
+            raise LoginError("Lotus browser was closed while waiting for manual login or verification.") from exc
+        raise
+
+
 def _login_form_is_visible(page: Page) -> bool:
     try:
         username = page.locator(locators.USERNAME_INPUT)
@@ -141,7 +154,7 @@ def _wait_for_login_form(page: Page, settings: AppSettings, log) -> None:
             if not _is_execution_context_reset(exc):
                 raise
 
-        page.wait_for_timeout(SECURITY_POLL_MS)
+        _wait_for_security_poll(page)
 
     raise LoginError(
         "Lotus login form did not become ready. "
@@ -189,7 +202,7 @@ def _wait_for_post_login(page: Page, settings: AppSettings, log) -> None:
             if not _is_execution_context_reset(exc):
                 raise
 
-        page.wait_for_timeout(SECURITY_POLL_MS)
+        _wait_for_security_poll(page)
 
     raise LoginError(
         "Lotus did not reach the post-login page after submit. "
@@ -230,14 +243,15 @@ def _wait_for_manual_login(page: Page, settings: AppSettings, log) -> None:
             if not _is_execution_context_reset(exc):
                 raise
 
-        page.wait_for_timeout(SECURITY_POLL_MS)
+        _wait_for_security_poll(page)
 
     raise LoginError("Timed out waiting for manual Lotus login to reach the post-login page.")
 
 
 def login(page: Page, settings: AppSettings, log) -> None:
-    if not settings.lotus_manual_login and (
-        not settings.lotus_username or not settings.lotus_password or not settings.lotus_secret_code
+    has_credentials = bool(settings.lotus_username and settings.lotus_password and settings.lotus_secret_code)
+    if not has_credentials and not (
+        settings.lotus_manual_login and settings.resolve_browser_mode("lotus") == "manual_assisted"
     ):
         raise ConfigurationError("Missing LOTUS_USERNAME, LOTUS_PASSWORD, or LOTUS_SECRET_CODE.")
 
@@ -248,6 +262,7 @@ def login(page: Page, settings: AppSettings, log) -> None:
 
     log("Opening Lotus login page")
     page.goto(locators.LOGIN_URL, wait_until="domcontentloaded")
+    page.bring_to_front()
 
     _wait_for_login_form(page, settings, log)
 
@@ -256,19 +271,24 @@ def login(page: Page, settings: AppSettings, log) -> None:
         return
 
     try:
+        pause(page, settings, log, "before filling Lotus login form")
         page.locator(locators.USERNAME_INPUT).fill(settings.lotus_username)
         page.locator(locators.PASSWORD_INPUT).fill(settings.lotus_password)
         secret_code_input = page.locator(locators.SECRET_CODE_INPUT)
         secret_code_input.fill(settings.lotus_secret_code)
+        log("Lotus login form filled")
 
         agreement = page.locator(locators.AGREEMENT_CHECKBOX)
         if agreement.count() > 0 and agreement.first.is_visible() and not agreement.first.is_checked():
             agreement.first.check()
 
         login_button = page.locator(locators.LOGIN_BUTTON)
+        pause(page, settings, log, "before submitting Lotus login form")
         if login_button.count() > 0 and login_button.first.is_visible():
+            log("Submitting Lotus login form with login button")
             login_button.first.click()
         else:
+            log("Submitting Lotus login form with Enter key")
             secret_code_input.press("Enter")
 
         _wait_for_post_login(page, settings, log)
@@ -347,50 +367,78 @@ def _visible_zip_entry_names(page: Page, limit: int = 10) -> list[str]:
     return entries
 
 
-def download_transaction_zip(page: Page, settings: AppSettings, run_date: date, temp_dir: Path, log) -> Path | None:
-    log("Opening Lotus ZIP report menu")
-    report_link = page.locator(locators.REPORT_LINK)
-    if report_link.count() > 0:
-        report_link.first.click()
-    else:
-        page.goto(locators.REPORT_URL, wait_until="domcontentloaded")
-    pause(page, settings, log, "after opening Lotus ZIP report menu")
-
-    short_token = schema.build_short_date_token(run_date)
-    long_token = schema.build_long_date_token(run_date)
-    zip_selector = f"xpath={locators.build_zip_link_xpath(short_token, long_token)}"
-    zip_links = page.locator(zip_selector)
-    if zip_links.count() == 0:
-        log(f"No Lotus ZIP report entry found for date tokens {short_token} / {long_token}")
-        visible_zip_entries = _visible_zip_entry_names(page)
-        if visible_zip_entries:
-            log(f"Visible Lotus ZIP entries: {', '.join(visible_zip_entries)}")
-        else:
-            log("No visible Lotus ZIP entries were found on the ZIP report page")
-        return None
-
-    log("Downloading Lotus ZIP report")
-    with page.expect_download(timeout=DOWNLOAD_TIMEOUT_MS) as download_info:
-        zip_links.first.click()
-    path = _save_download_to_temp(download_info.value, temp_dir)
-    pause(page, settings, log, f"after downloading {path.name}")
-    return path
-
-
-def download_summary_export(page: Page, settings: AppSettings, run_date: date, temp_dir: Path, log) -> Path | None:
+def _open_lotus_summary_report_page(page: Page, settings: AppSettings, log) -> None:
     log("Opening Lotus summary report page")
     summary_link = page.locator(locators.SUMMARY_LINK)
     if summary_link.count() > 0:
         summary_link.first.click()
     else:
         page.goto(locators.SUMMARY_URL, wait_until="domcontentloaded")
-
     wait_for_visible(page, locators.REPORT_TYPE_SELECT, timeout_ms=DEFAULT_TIMEOUT_MS)
-    page.locator(locators.REPORT_TYPE_SELECT).select_option(value="RPTHO019")
 
-    input_date = schema.build_summary_input_date(run_date)
+
+def _prepare_lotus_report_search(page: Page, report_type: str, input_date: str) -> None:
+    page.locator(locators.REPORT_TYPE_SELECT).select_option(value=report_type)
     _set_readonly_input_value(page, locators.START_DATE_INPUT, input_date)
     _set_readonly_input_value(page, locators.END_DATE_INPUT, input_date)
+
+
+def _download_lotus_pdf_report(
+    page: Page,
+    settings: AppSettings,
+    report_type: str,
+    report_label: str,
+    input_date: str,
+    temp_dir: Path,
+    log,
+) -> Path:
+    _open_lotus_summary_report_page(page, settings, log)
+    _prepare_lotus_report_search(page, report_type, input_date)
+
+    view_button = page.locator(locators.VIEW_BUTTON)
+    if view_button.count() == 0 or not view_button.first.is_visible():
+        raise DownloadError(f"No Lotus PDF view button was visible for {report_label}.")
+
+    log(f"Downloading Lotus {report_label} PDF")
+    try:
+        with page.expect_download(timeout=DOWNLOAD_TIMEOUT_MS) as download_info:
+            view_button.first.click()
+        path = _save_download_to_temp(download_info.value, temp_dir)
+        pause(page, settings, log, f"after downloading {path.name}")
+        return path
+    except PlaywrightTimeoutError:
+        raise DownloadError(f"Timed out downloading Lotus {report_label} PDF.")
+    except Exception as exc:
+        raise DownloadError(f"Failed to download Lotus {report_label} PDF.") from exc
+
+
+def download_transaction_pdf(page: Page, settings: AppSettings, run_date: date, temp_dir: Path, log) -> list[Path]:
+    input_date = schema.build_summary_input_date(run_date)
+    downloaded: list[Path] = []
+
+    for report_type, report_label in (
+        ("RPTHO018", "transaction detail"),
+        ("RPTHO019", "transaction summary"),
+    ):
+        downloaded.append(
+            _download_lotus_pdf_report(
+                page,
+                settings,
+                report_type,
+                report_label,
+                input_date,
+                temp_dir,
+                log,
+            )
+        )
+
+    return downloaded
+
+
+def download_export_zip(page: Page, settings: AppSettings, run_date: date, temp_dir: Path, log) -> Path | None:
+    input_date = schema.build_summary_input_date(run_date)
+    _open_lotus_summary_report_page(page, settings, log)
+    _prepare_lotus_report_search(page, "RPTHO019", input_date)
     page.locator(locators.SEARCH_BUTTON).click()
     pause(page, settings, log, "after searching Lotus summary report")
 
@@ -410,7 +458,7 @@ def download_summary_export(page: Page, settings: AppSettings, run_date: date, t
         log("No Lotus export search button was visible after opening export page")
         return None
 
-    log("Downloading Lotus summary export")
+    log("Downloading Lotus export zip")
     try:
         with page.expect_download(timeout=DOWNLOAD_TIMEOUT_MS) as download_info:
             export_search_button.first.click()
@@ -418,9 +466,9 @@ def download_summary_export(page: Page, settings: AppSettings, run_date: date, t
         pause(page, settings, log, f"after downloading {path.name}")
         return path
     except PlaywrightTimeoutError:
-        raise DownloadError("Timed out downloading Lotus summary export.")
+        raise DownloadError("Timed out downloading Lotus export zip.")
     except Exception as exc:
-        raise DownloadError("Failed to download Lotus summary export.") from exc
+        raise DownloadError("Failed to download Lotus export zip.") from exc
 
 
 def download_web_reports(
@@ -435,19 +483,19 @@ def download_web_reports(
     details: list[str] = []
     downloaded_files: list[Path] = []
 
-    zip_path = download_transaction_zip(page, settings, run_date, temp_dir, log)
-    if zip_path is None:
-        missing_items.append("zip report")
+    pdf_paths = download_transaction_pdf(page, settings, run_date, temp_dir, log)
+    if not pdf_paths:
+        missing_items.append("transaction PDF reports")
     else:
-        available_items.append("zip report")
-        downloaded_files.append(zip_path)
+        available_items.append("transaction PDF reports")
+        downloaded_files.extend(pdf_paths)
 
-    summary_path = download_summary_export(page, settings, run_date, temp_dir, log)
-    if summary_path is None:
-        missing_items.append("summary export")
+    export_path = download_export_zip(page, settings, run_date, temp_dir, log)
+    if export_path is None:
+        missing_items.append("export zip")
     else:
-        available_items.append("summary export")
-        downloaded_files.append(summary_path)
+        available_items.append("export zip")
+        downloaded_files.append(export_path)
 
     if missing_items and not available_items:
         raise NoDataError(build_no_data_message(run_date, missing_items, details))

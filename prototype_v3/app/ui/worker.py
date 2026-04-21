@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from dataclasses import replace
+
 from PySide6.QtCore import QThread, Signal
 
 from app.core.config import AppSettings
@@ -17,6 +19,9 @@ class JobWorker(QThread):
         self.request = request
 
     def run(self) -> None:
-        runner = JobRunner(self.settings)
+        settings = self.settings
+        if self.request.lotus_manual_login is not None:
+            settings = replace(settings, lotus_manual_login=self.request.lotus_manual_login)
+        runner = JobRunner(settings)
         result = runner.run(self.request, self.log_emitted.emit)
         self.finished_with_result.emit(result)

@@ -9,7 +9,7 @@ PASSWORD_INPUT = "input[name='formLogin:j_id_jsp_177548282_6']"
 SECRET_CODE_INPUT = "input[name='formLogin:j_id_jsp_177548282_7']"
 AGREEMENT_CHECKBOX = "input[type='checkbox']"
 LOGIN_BUTTON = (
-    "xpath=//input[(@type='submit' or @type='button') and contains(@value,'เข้า')]"
+    "xpath=//input[(@type='submit' or @type='button') and (contains(@value,'เข้า') or contains(@name,'j_id_jsp_177548282_8'))]"
     " | //button[contains(normalize-space(.),'เข้า')]"
 )
 
@@ -24,6 +24,7 @@ REPORT_TYPE_SELECT = "select[name='frmBillerMonitor:j_id_jsp_108231391_10']"
 START_DATE_INPUT = "[id='frmBillerMonitor:selectStartDateInputDate']"
 END_DATE_INPUT = "[id='frmBillerMonitor:selectEndDateInputDate']"
 SEARCH_BUTTON = "xpath=//img[contains(@src,'cmd_search_mout.gif')]"
+VIEW_BUTTON = "xpath=//img[contains(@src,'cmd_view_mout.gif')]/ancestor::a[1]"
 EXPORT_BUTTON = "xpath=//img[contains(@src,'icon_export.png')]"
 EXPORT_SEARCH_BUTTON = "xpath=//img[@id='frmBillerMonitor:btnSearch']/ancestor::a[1]"
 LOGOUT_BUTTON = POST_LOGIN_READY
