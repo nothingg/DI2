@@ -1,0 +1,1 @@
+# Thai Post adapter package.

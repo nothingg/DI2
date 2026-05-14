@@ -1,0 +1,2 @@
+FTP_SOURCE_LABEL = "Thai Post FTP"
+SFTP_SOURCE_LABEL = "Thai Post SFTP"
