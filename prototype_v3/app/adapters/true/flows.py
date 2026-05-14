@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import date
 from pathlib import Path
+from time import monotonic
 
 from playwright.sync_api import Page, TimeoutError as PlaywrightTimeoutError
 
@@ -25,6 +26,24 @@ def pause(page: Page, settings: AppSettings, log, reason: str) -> None:
     page.wait_for_timeout(seconds * 1000)
 
 
+def _first_visible_selector(page: Page, selectors: list[str]) -> str | None:
+    for selector in selectors:
+        locator = page.locator(selector).first
+        if locator.count() > 0 and locator.is_visible():
+            return selector
+    return None
+
+
+def _wait_for_first_visible_selector(page: Page, selectors: list[str], timeout_ms: int) -> str:
+    deadline = monotonic() + (timeout_ms / 1000)
+    while monotonic() < deadline:
+        visible_selector = _first_visible_selector(page, selectors)
+        if visible_selector is not None:
+            return visible_selector
+        page.wait_for_timeout(200)
+    return wait_for_any_visible(page, selectors, timeout_ms=1000)
+
+
 def login(page: Page, settings: AppSettings, log) -> None:
     if not settings.true_username or not settings.true_password:
         raise ConfigurationError("Missing TRUE_USERNAME or TRUE_PASSWORD.")
@@ -34,31 +53,50 @@ def login(page: Page, settings: AppSettings, log) -> None:
     wait_for_page_ready(page)
 
     try:
-        wait_for_visible(page, locators.USERNAME_INPUT, timeout_ms=DEFAULT_TIMEOUT_MS)
-        wait_for_visible(page, locators.PASSWORD_INPUT, timeout_ms=DEFAULT_TIMEOUT_MS)
-        fill_text(page, locators.USERNAME_INPUT, settings.true_username)
-        password_input = page.locator(locators.PASSWORD_INPUT)
-        password_input.fill(settings.true_password)
-        click(page, locators.LOGIN_BUTTON)
-        try:
-            visible_selector = wait_for_any_visible(
-                page,
-                [
-                    locators.POST_LOGIN_READY,
-                    locators.LOGIN_ERROR_MESSAGE,
-                    locators.USERNAME_INPUT,
-                ],
-                timeout_ms=DEFAULT_TIMEOUT_MS,
-            )
-        except Exception as exc:
-            raise
+        visible_selector = _wait_for_first_visible_selector(
+            page,
+            [
+                locators.POST_LOGIN_READY,
+                locators.USERNAME_INPUT,
+                locators.LOGIN_ERROR_MESSAGE,
+            ],
+            timeout_ms=DEFAULT_TIMEOUT_MS,
+        )
+        if visible_selector == locators.POST_LOGIN_READY:
+            log("True portal already has an active session")
+            pause(page, settings, log, "after confirming active session")
+            return
         if visible_selector == locators.LOGIN_ERROR_MESSAGE:
             message = page.locator(locators.LOGIN_ERROR_MESSAGE).first.inner_text().strip()
             raise LoginError(
                 "True rejected the username or password"
                 f"{': ' + message if message else '.'}"
             )
-        if visible_selector == locators.USERNAME_INPUT:
+
+        wait_for_visible(page, locators.PASSWORD_INPUT, timeout_ms=DEFAULT_TIMEOUT_MS)
+        fill_text(page, locators.USERNAME_INPUT, settings.true_username)
+        password_input = page.locator(locators.PASSWORD_INPUT)
+        password_input.fill(settings.true_password)
+        click(page, locators.LOGIN_BUTTON)
+        try:
+            visible_selector = _wait_for_first_visible_selector(
+                page,
+                [
+                    locators.POST_LOGIN_READY,
+                    locators.LOGIN_ERROR_MESSAGE,
+                ],
+                timeout_ms=DEFAULT_TIMEOUT_MS,
+            )
+        except PlaywrightTimeoutError:
+            visible_selector = None
+
+        if visible_selector == locators.LOGIN_ERROR_MESSAGE:
+            message = page.locator(locators.LOGIN_ERROR_MESSAGE).first.inner_text().strip()
+            raise LoginError(
+                "True rejected the username or password"
+                f"{': ' + message if message else '.'}"
+            )
+        if visible_selector != locators.POST_LOGIN_READY:
             password_input = page.locator(locators.PASSWORD_INPUT)
             if password_input.count() > 0 and password_input.first.is_visible():
                 raise LoginError(

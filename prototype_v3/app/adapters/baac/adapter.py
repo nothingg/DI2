@@ -49,6 +49,7 @@ class BaacAdapter(BillerAdapter):
                         remote_dir=self.settings.baac_servu_path,
                         filename=filename,
                         local_dir=context.temp_dir,
+                        log=log,
                     )
                 except Exception as exc:
                     raise PartialDataError(

@@ -43,6 +43,7 @@ class TrueAdapter(BillerAdapter):
                         remote_dir=self.settings.true_servu_path,
                         filename=filename,
                         local_dir=context.temp_dir,
+                        log=log,
                     )
             else:
                 log("Skipping True SFTP download because TRUE_FETCH_SERVU is disabled")

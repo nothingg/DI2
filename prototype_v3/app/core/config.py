@@ -89,6 +89,12 @@ class AppSettings:
     counter_service_username: str | None
     counter_service_password: str | None
     counter_service_fetch_servu: bool
+    thaipost_fetch_servu: bool
+    thaipost_ftp_host: str | None
+    thaipost_ftp_port: int
+    thaipost_ftp_username: str | None
+    thaipost_ftp_password: str | None
+    thaipost_ftp_path: str
     servu_host: str | None
     servu_port: int
     servu_username: str | None
@@ -98,6 +104,7 @@ class AppSettings:
     baac_servu_path: str
     true_servu_path: str
     counter_service_servu_path: str
+    thaipost_servu_path: str
 
     def resolve_browser_mode(self, biller: str) -> str:
         normalized = biller.replace("-", "_").lower()
@@ -150,6 +157,12 @@ class AppSettings:
             counter_service_username=os.getenv("COUNTER_SERVICE_USERNAME") or None,
             counter_service_password=os.getenv("COUNTER_SERVICE_PASSWORD") or None,
             counter_service_fetch_servu=_to_bool(os.getenv("COUNTER_SERVICE_FETCH_SERVU"), default=True),
+            thaipost_fetch_servu=_to_bool(os.getenv("THAIPOST_FETCH_SERVU"), default=True),
+            thaipost_ftp_host=os.getenv("THAIPOST_FTP_HOST") or None,
+            thaipost_ftp_port=int(os.getenv("THAIPOST_FTP_PORT", "21")),
+            thaipost_ftp_username=os.getenv("THAIPOST_FTP_USERNAME") or None,
+            thaipost_ftp_password=os.getenv("THAIPOST_FTP_PASSWORD") or None,
+            thaipost_ftp_path=os.getenv("THAIPOST_FTP_PATH", "/"),
             servu_host=os.getenv("SERVU_HOST") or None,
             servu_port=int(os.getenv("SERVU_PORT", "22")),
             servu_username=os.getenv("SERVU_USERNAME") or None,
@@ -159,4 +172,5 @@ class AppSettings:
             baac_servu_path=os.getenv("BAAC_SERVU_PATH", "/DCR/BAAC/IN/"),
             true_servu_path=os.getenv("TRUE_SERVU_PATH", "/DCR/TRUE/IN/"),
             counter_service_servu_path=os.getenv("COUNTER_SERVICE_SERVU_PATH", "/DCR/CST/IN/"),
+            thaipost_servu_path=os.getenv("THAIPOST_SERVU_PATH", "/DCR/CAT/IN/"),
         )

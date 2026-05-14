@@ -40,7 +40,7 @@ class MainWindow(QMainWindow):
         self.resize(760, 520)
 
         self.biller_combo = QComboBox()
-        self.biller_combo.addItems(["mpay", "lotus", "lotus_tims", "true", "counter_service", "baac", "baac_stmt"])
+        self.biller_combo.addItems(["mpay", "lotus", "lotus_tims", "true", "counter_service", "baac", "baac_stmt", "thaipost"])
 
         self.date_edit = QDateEdit()
         self.date_edit.setCalendarPopup(True)
@@ -186,6 +186,12 @@ class MainWindow(QMainWindow):
             self.date_hint_label.setText(
                 "BAAC Statement uses the selected run date, but weekend dates are adjusted "
                 f"back to Friday. The current statement lookup date is {statement_date.isoformat()}."
+            )
+            return
+
+        if biller == "thaipost":
+            self.date_hint_label.setText(
+                "Thai Post downloads files from the FTP source and can optionally fetch matching SFTP copies from Serv-U."
             )
             return
 

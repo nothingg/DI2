@@ -92,6 +92,7 @@ class MpayAdapter(BillerAdapter):
                     remote_dir=self.settings.mpay_servu_path,
                     filename=servu_filename,
                     local_dir=context.temp_dir,
+                    log=log,
                 )
                 flows.validate_downloads_with_servu(context.temp_dir, context.run_date)
             else:

@@ -48,6 +48,7 @@ class LotusAdapter(BillerAdapter):
                         remote_dir=self.settings.lotus_servu_path,
                         filename=filename,
                         local_dir=context.temp_dir,
+                        log=log,
                     )
             else:
                 log("Skipping Lotus SFTP download because LOTUS_FETCH_SERVU is disabled")

@@ -49,6 +49,7 @@ class CounterServiceAdapter(BillerAdapter):
                     filename=filename,
                     local_dir=context.temp_dir,
                     rename_on_conflict=True,
+                    log=log,
                 )
             else:
                 log("Skipping Counter Service SFTP download because COUNTER_SERVICE_FETCH_SERVU is disabled")

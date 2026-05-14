@@ -10,6 +10,7 @@ from app.adapters.counter_service.adapter import CounterServiceAdapter
 from app.adapters.lotus.adapter import LotusAdapter
 from app.adapters.lotus_tims.adapter import LotusTimsAdapter
 from app.adapters.mpay.adapter import MpayAdapter
+from app.adapters.thaipost.adapter import ThaiPostAdapter
 from app.adapters.true.adapter import TrueAdapter
 from app.core.config import AppSettings
 from app.core.errors import AppError, NoDataError, PartialDataError
@@ -32,6 +33,7 @@ class JobRunner:
             "lotus": LotusAdapter(settings=settings),
             "lotus_tims": LotusTimsAdapter(settings=settings),
             "mpay": MpayAdapter(settings=settings),
+            "thaipost": ThaiPostAdapter(settings=settings),
             "true": TrueAdapter(settings=settings),
         }
 

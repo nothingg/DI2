@@ -15,6 +15,7 @@ def download_file(
     filename: str,
     local_dir: Path,
     rename_on_conflict: bool = False,
+    log=None,
 ) -> Path:
     if not settings.servu_host or not settings.servu_username or not settings.servu_password:
         raise ConfigurationError("Missing SERVU_HOST, SERVU_USERNAME, or SERVU_PASSWORD.")
@@ -30,16 +31,38 @@ def download_file(
     sftp = None
 
     try:
+        if log:
+            log(f"Connecting to SFTP server: {settings.servu_host}:{settings.servu_port}")
         transport = paramiko.Transport((settings.servu_host, settings.servu_port))
         transport.connect(username=settings.servu_username, password=settings.servu_password)
         sftp = paramiko.SFTPClient.from_transport(transport)
         sftp.chdir(remote_dir)
+        if log:
+            log(f"Downloading SFTP file from {remote_dir}: {filename}")
         sftp.get(f"{remote_dir}{filename}", str(local_path))
         return local_path
     except Exception as exc:
-        raise DownloadError(f"Failed to download SFTP file: {filename}") from exc
+        raise DownloadError(f"Failed to download SFTP file: {filename}. Reason: {exc}") from exc
     finally:
         if sftp is not None:
-            sftp.close()
+            if log:
+                log("Disconnecting SFTP client")
+            try:
+                sftp.close()
+                if log:
+                    log("SFTP client disconnected")
+            except Exception as exc:
+                if log:
+                    log(f"SFTP client disconnect failed: {exc}")
         if transport is not None:
-            transport.close()
+            if log:
+                log("Disconnecting SFTP transport")
+            try:
+                transport.close()
+                if log:
+                    log("SFTP transport disconnected")
+            except Exception as exc:
+                if log:
+                    log(f"SFTP transport disconnect failed: {exc}")
+        if sftp is None and transport is None and log:
+            log("No SFTP connection was opened")
